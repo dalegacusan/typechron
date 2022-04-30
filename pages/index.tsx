@@ -1,10 +1,10 @@
 import type { NextPage } from "next";
-import styles from "../styles/Home.module.css";
 import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTime } from "../utils/time";
 import Countdown from "react-countdown";
-import GameTime from "./components/game-time";
+import GameTime from "../components/game-time";
+import CurrentWord from "../components/current-word";
 
 const gameInitialTimeInMs = 10000;
 
@@ -39,7 +39,6 @@ const Home: NextPage = () => {
     const word = GenerateWord();
 
     setUserInput("");
-    setUserScore((prevUserScore) => (prevUserScore += 1));
 
     while (true) {
       if (doneWords.includes(word)) {
@@ -84,26 +83,27 @@ const Home: NextPage = () => {
     // Update high score
   };
 
-  useEffect(() => {
-    if (!startTime) {
-      setStartTime(CurrentTime());
-    }
+  const handleUserInput = (e) => {
+    const { value } = e.target;
 
-    if (!isInGame && userInput.toLowerCase() === "start") {
+    setUserInput(value);
+
+    if (!isInGame && value.toLowerCase() === "start") {
       handleStartGame();
     }
 
-    if (isInGame && userInput.trim() === currentWord) {
+    if (isInGame && value.trim() === currentWord) {
       if (startTime) {
         const durationInMinutes = (CurrentTime() - startTime) / 60000.0;
 
         setWpm(((doneWords.length + 1) / durationInMinutes).toFixed(2));
       }
 
+      setUserScore((prevUserScore) => (prevUserScore += currentWord.length));
       handleAdditionalGameTime();
       handleInitiateRound();
     }
-  }, [userInput]);
+  };
 
   useEffect(() => {
     if (gameTime <= 0) {
@@ -112,7 +112,7 @@ const Home: NextPage = () => {
   }, [gameTime]);
 
   return (
-    <div className={styles.container}>
+    <div>
       {isInGame ? (
         <Countdown
           date={Date.now() + gameTime}
@@ -126,18 +126,26 @@ const Home: NextPage = () => {
 
       {!isInGame && <h2>Enter "start" to begin</h2>}
 
-      {isInGame && <h4>{currentWord}</h4>}
+      {isInGame && (
+        <>
+          <p>Round {doneWords.length}</p>
 
+          <CurrentWord word={currentWord} userInput={userInput} />
+        </>
+      )}
+
+      {/* Add a visual indicator like +1 on every correct word (Mantine Tooltip?) */}
       <input
         type="text"
         placeholder={isInGame ? currentWord : "start"}
         value={userInput}
-        onChange={({ target }) => setUserInput(target.value)}
+        onChange={(e) => handleUserInput(e)}
         onPaste={(e) => {
           e.preventDefault();
           return false;
         }}
         autoComplete="false"
+        className="word-input"
       />
 
       {isInGame && (

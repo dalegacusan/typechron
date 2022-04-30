@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+
 html,
 body {
   padding: 0;
@@ -6,11 +8,24 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 * {
   box-sizing: border-box;
+}
+
+.correct {
+  background-color: #dfffa8;
+}
+
+.incorrect {
+  background-color: #fcbea4;
+}
+
+.word-input {
+  border: none;
+  font-family: monospace;
+  font-size: 34px;
+}
+
+.word-input:focus {
+  outline: none;
 }
