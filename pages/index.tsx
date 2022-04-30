@@ -2,11 +2,11 @@ import type { NextPage } from "next";
 import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTime } from "../utils/time";
-import Countdown from "react-countdown";
-import GameTime from "../components/game-time";
+import { gameInitialTimeInMs } from "../config";
+import { Input, Paper } from "@mantine/core";
 import CurrentWord from "../components/current-word";
-
-const gameInitialTimeInMs = 10000;
+import GameHeader from "../components/game-header";
+import GameStats from "../components/game-stats";
 
 const Home: NextPage = () => {
   const [userInput, setUserInput] = useState<string>("");
@@ -17,9 +17,12 @@ const Home: NextPage = () => {
   const [gameTimeIntervalId, setGameTimeIntervalId] =
     useState<ReturnType<typeof setInterval>>(); // @ref https://stackoverflow.com/a/59681620/12278028
   const [isInGame, setIsInGame] = useState(false);
+  const [isGameEnded, setIsGameEnded] = useState(false);
 
-  const [startTime, setStartTime] = useState<number | undefined>(undefined);
-  const [wpm, setWpm] = useState<string>("");
+  const [gameStartTime, setGameStartTime] = useState<number | undefined>(
+    undefined
+  );
+  const [wpm, setWpm] = useState<string>("0");
 
   const handleAdditionalGameTime = () => {
     // 1 in 10 chance to get extra 2 seconds
@@ -36,13 +39,13 @@ const Home: NextPage = () => {
   };
 
   const handleInitiateRound = () => {
-    const word = GenerateWord();
+    let word = GenerateWord();
 
     setUserInput("");
 
     while (true) {
       if (doneWords.includes(word)) {
-        continue;
+        word = GenerateWord();
       } else {
         setCurrentWord(word);
         setDoneWords((prevWords) => [...prevWords, word]);
@@ -53,7 +56,14 @@ const Home: NextPage = () => {
   };
 
   const handleStartGame = () => {
+    // Reset game state
+    setIsGameEnded(false);
+    setUserScore(0);
+    setDoneWords([]);
+    setWpm("0");
+
     setIsInGame(true);
+
     handleInitiateRound();
 
     const gameTimeInterval = setInterval(() => {
@@ -72,29 +82,28 @@ const Home: NextPage = () => {
     setGameTime(gameInitialTimeInMs);
 
     setUserInput("");
-    setUserScore(0);
     setCurrentWord("");
-    setDoneWords([]);
     setIsInGame(false);
+    setIsGameEnded(true);
 
-    setStartTime(undefined);
-    setWpm("");
+    setGameStartTime(undefined);
 
     // Update high score
   };
 
-  const handleUserInput = (e) => {
-    const { value } = e.target;
-
-    setUserInput(value);
-
-    if (!isInGame && value.toLowerCase() === "start") {
+  useEffect(() => {
+    if (!isInGame && userInput.toLowerCase() === "start") {
       handleStartGame();
     }
 
-    if (isInGame && value.trim() === currentWord) {
-      if (startTime) {
-        const durationInMinutes = (CurrentTime() - startTime) / 60000.0;
+    if (isInGame && !gameStartTime) {
+      setGameStartTime(CurrentTime());
+    }
+
+    if (isInGame && userInput.trim() === currentWord) {
+      if (gameStartTime) {
+        // @ref https://betterprogramming.pub/create-a-typing-game-with-react-hooks-usekeypress-and-faker-28bbc7919820
+        const durationInMinutes = (CurrentTime() - gameStartTime) / 60000.0;
 
         setWpm(((doneWords.length + 1) / durationInMinutes).toFixed(2));
       }
@@ -103,7 +112,7 @@ const Home: NextPage = () => {
       handleAdditionalGameTime();
       handleInitiateRound();
     }
-  };
+  }, [userInput]);
 
   useEffect(() => {
     if (gameTime <= 0) {
@@ -113,47 +122,42 @@ const Home: NextPage = () => {
 
   return (
     <div>
-      {isInGame ? (
-        <Countdown
-          date={Date.now() + gameTime}
-          intervalDelay={0}
-          precision={3}
-          renderer={GameTime}
-        />
-      ) : (
-        <p>{gameInitialTimeInMs / 1000.0}:00</p> // @ref https://stackoverflow.com/a/14090907/12278028
-      )}
-
-      {!isInGame && <h2>Enter "start" to begin</h2>}
-
-      {isInGame && (
-        <>
-          <p>Round {doneWords.length}</p>
-
-          <CurrentWord word={currentWord} userInput={userInput} />
-        </>
-      )}
-
-      {/* Add a visual indicator like +1 on every correct word (Mantine Tooltip?) */}
-      <input
-        type="text"
-        placeholder={isInGame ? currentWord : "start"}
-        value={userInput}
-        onChange={(e) => handleUserInput(e)}
-        onPaste={(e) => {
-          e.preventDefault();
-          return false;
-        }}
-        autoComplete="false"
-        className="word-input"
+      <GameHeader
+        isInGame={isInGame}
+        isGameEnded={isGameEnded}
+        gameTime={gameTime}
+        round={doneWords.length}
       />
 
-      {isInGame && (
-        <>
-          <p>Score: {userScore}</p>
-          <p>WPM: {wpm}</p>
-        </>
-      )}
+      <GameStats score={userScore} wpm={wpm} />
+
+      <CurrentWord
+        word={currentWord}
+        userInput={userInput}
+        isInGame={isInGame}
+      />
+
+      {/* TODO - Add a visual indicator like +1 on every correct word (Mantine Tooltip?) */}
+      <Paper
+        px="md"
+        py="xs"
+        my="md"
+        style={{ backgroundColor: "#101113" }}
+        withBorder
+      >
+        <Input
+          variant="unstyled"
+          size="lg"
+          placeholder={isInGame ? currentWord : "start"}
+          value={userInput}
+          onChange={(e) => setUserInput(e.target.value)}
+          onPaste={(e) => {
+            e.preventDefault();
+            return false;
+          }} // Prevent pasting in input
+          autoComplete="false"
+        />
+      </Paper>
     </div>
   );
 };

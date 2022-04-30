@@ -6,11 +6,7 @@ interface GameTimeProps {
 }
 
 const GameTime = ({ seconds, milliseconds }: GameTimeProps) => {
-  return (
-    <span>
-      {seconds}:{milliseconds}
-    </span>
-  );
+  return `${seconds}:${milliseconds}s`;
 };
 
 export default GameTime;

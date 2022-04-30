@@ -1,4 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=VT323&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap");
+
+/* font-family: "VT323", monospace; */
+/* font-family: "Press Start 2P", cursive; */
 
 html,
 body {
@@ -12,20 +15,10 @@ body {
   box-sizing: border-box;
 }
 
-.correct {
-  background-color: #dfffa8;
+.green {
+  color: #82c91e;
 }
 
-.incorrect {
-  background-color: #fcbea4;
-}
-
-.word-input {
-  border: none;
-  font-family: monospace;
-  font-size: 34px;
-}
-
-.word-input:focus {
-  outline: none;
+.red {
+  color: #fa5252;
 }
