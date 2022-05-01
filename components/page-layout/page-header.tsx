@@ -5,9 +5,17 @@ import {
   Container,
   Title,
   Indicator,
-  Button,
+  Avatar,
+  Loader,
+  Menu,
+  ActionIcon,
+  Group,
 } from "@mantine/core";
 import HelpModal from "../help-modal";
+import { useAuth } from "../../ contexts/authUserContext";
+import { useRouter } from "next/router";
+import { Logout } from "tabler-icons-react";
+import Link from "next/link";
 
 const HEADER_HEIGHT = 70;
 
@@ -23,10 +31,34 @@ const useStyles = createStyles((theme) => ({
     alignItems: "center",
     height: "100%",
   },
+
+  link: {
+    display: "block",
+    lineHeight: 1,
+    padding: "8px 12px",
+    borderRadius: theme.radius.sm,
+    textDecoration: "none",
+    color:
+      theme.colorScheme === "dark"
+        ? theme.colors.dark[0]
+        : theme.colors.gray[7],
+    fontSize: theme.fontSizes.sm,
+    fontWeight: 500,
+    cursor: "pointer",
+
+    "&:hover": {
+      backgroundColor:
+        theme.colorScheme === "dark"
+          ? theme.colors.dark[6]
+          : theme.colors.gray[0],
+    },
+  },
 }));
 
 export function PageHeader() {
   const { classes } = useStyles();
+  const { authUser, loading, signOut } = useAuth();
+  const router = useRouter();
 
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
@@ -34,17 +66,53 @@ export function PageHeader() {
     <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
       <HelpModal isOpenModal={isOpenModal} setIsOpenModal={setIsOpenModal} />
       <Container size="sm" className={classes.header}>
-        <Indicator inline label="v1" size={16}>
-          <Title order={3}>Typechron</Title>
+        <Indicator inline label="v1" color="gray" size={16}>
+          <Link href="/" passHref>
+            <Title order={3} style={{ cursor: "pointer" }}>
+              Typechron
+            </Title>
+          </Link>
         </Indicator>
 
-        <Button
-          variant="subtle"
-          color="gray"
-          onClick={() => setIsOpenModal(true)}
-        >
-          Help
-        </Button>
+        <Group spacing={5}>
+          <a className={classes.link} onClick={() => setIsOpenModal(true)}>
+            Help
+          </a>
+          <a className={classes.link} onClick={() => {}}>
+            Leaderboards
+          </a>
+
+          {loading && !authUser && <Loader size="sm" />}
+
+          {!loading && !authUser && (
+            <a className={classes.link} onClick={() => router.push("/login")}>
+              Sign in
+            </a>
+          )}
+
+          {!loading && authUser && (
+            <Menu
+              control={
+                <ActionIcon>
+                  <Avatar
+                    src={authUser.photoUrl}
+                    alt={authUser.displayName as string}
+                    radius="xl"
+                  />
+                </ActionIcon>
+              }
+              ml={8}
+              gutter={12}
+              withArrow
+            >
+              <Menu.Label>My Account</Menu.Label>
+
+              <Menu.Item icon={<Logout size={14} />} onClick={() => signOut()}>
+                Sign out
+              </Menu.Item>
+            </Menu>
+          )}
+        </Group>
       </Container>
     </Header>
   );

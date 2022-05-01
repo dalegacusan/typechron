@@ -3,12 +3,16 @@ import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTime } from "../utils/time";
 import { gameInitialTimeInMs } from "../config";
-import { Input, Paper } from "@mantine/core";
+import { Button, Input, Paper, Text } from "@mantine/core";
+import { useAuth } from "../ contexts/authUserContext";
 import CurrentWord from "../components/current-word";
 import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
+import Link from "next/link";
 
 const Home: NextPage = () => {
+  const { authUser, loading } = useAuth();
+
   const [userInput, setUserInput] = useState<string>("");
   const [userScore, setUserScore] = useState<number>(0);
   const [currentWord, setCurrentWord] = useState<string>("");
@@ -158,6 +162,19 @@ const Home: NextPage = () => {
           autoComplete="false"
         />
       </Paper>
+
+      {isGameEnded && !loading && !authUser && (
+        <Text>
+          <Link href="/login" passHref>
+            <Text component="a" variant="link">
+              Sign-in
+            </Text>
+          </Link>{" "}
+          to save your record.
+        </Text>
+      )}
+
+      {isGameEnded && !loading && authUser && <Button>Save record</Button>}
     </div>
   );
 };

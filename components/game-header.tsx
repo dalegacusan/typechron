@@ -22,7 +22,7 @@ const GameHeader = (props: GameHeaderProps) => {
             // Display game time in milliseconds
             <Countdown
               date={Date.now() + gameTime}
-              intervalDelay={0}
+              intervalDelay={20}
               precision={3}
               renderer={GameTime}
             />
@@ -37,7 +37,7 @@ const GameHeader = (props: GameHeaderProps) => {
           {/* Display Round */}
           {!isGameEnded && `Round ${round + 1}`}
           {/* Display "Game Ended" */}
-          {!isInGame && isGameEnded && `Game Ended - Round ${round + 1}`}
+          {!isInGame && isGameEnded && `Game Over - Round ${round + 1}`}
         </Text>
       </Grid.Col>
     </Grid>
