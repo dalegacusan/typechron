@@ -3,7 +3,7 @@ import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTime } from "../utils/time";
 import { gameInitialTimeInMs } from "../config";
-import { Button, Input, Paper, Text } from "@mantine/core";
+import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import CurrentWord from "../components/current-word";
 import GameHeader from "../components/game-header";
@@ -163,18 +163,42 @@ const Home: NextPage = () => {
         />
       </Paper>
 
-      {isGameEnded && !loading && !authUser && (
-        <Text>
-          <Link href="/login" passHref>
-            <Text component="a" variant="link">
-              Sign-in
-            </Text>
-          </Link>{" "}
-          to save your record.
-        </Text>
-      )}
+      <Box mb={12}>
+        {isGameEnded && !loading && !authUser && (
+          <Text>
+            <Link href="/login" passHref>
+              <Text component="a" variant="link">
+                Sign-in
+              </Text>
+            </Link>{" "}
+            to save your record.
+          </Text>
+        )}
 
-      {isGameEnded && !loading && authUser && <Button>Save record</Button>}
+        {isGameEnded && !loading && authUser && (
+          <Button color="gray">Save record</Button>
+        )}
+      </Box>
+
+      {/* Display done words for reference on how well a user did */}
+      <Box>
+        {doneWords.map((word: string, idx: number) => {
+          const isNewWord = doneWords.length - 1 === idx;
+          const withComma = doneWords.length - 2 === idx;
+
+          // Don't display the new word that hasn't been finished yet
+          if (isNewWord) {
+            return null;
+          }
+
+          return (
+            <Text key={idx} component="span">
+              {word}
+              {withComma ? "" : ", "}
+            </Text>
+          );
+        })}
+      </Box>
     </div>
   );
 };
