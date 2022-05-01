@@ -2,6 +2,7 @@ import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { GenerateWord } from "./words";
 import { Game } from "../interfaces/game.interface";
+import { User } from "../interfaces/user.interface";
 import { v4 as uuidv4 } from "uuid";
 
 export const getOneUserById = async (id: string) => {
@@ -44,6 +45,7 @@ export const createUser = async (
 
 export const createGame = async (game: Game) => {
   const newGame: Game = {
+    id: uuidv4(),
     userId: game.userId,
     round: game.round,
     points: game.points,
@@ -51,7 +53,7 @@ export const createGame = async (game: Game) => {
     words: game.words,
   };
 
-  const res = await addDoc(collection(firebaseDb, "games"), newGame);
+  await addDoc(collection(firebaseDb, "games"), newGame);
 
-  return { id: res.id, ...newGame };
+  return newGame;
 };

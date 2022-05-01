@@ -1,8 +1,8 @@
 import type { NextPage } from "next";
 import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
-import { CurrentTime } from "../utils/time";
-import { initialGameTimeInMs } from "../config";
+import { CurrentTimeInMs } from "../utils/time";
+import { black, initialGameTimeInMs } from "../config";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { createGame } from "../utils/firebase-functions";
@@ -21,17 +21,16 @@ const Home: NextPage = () => {
   const [userScore, setUserScore] = useState<number>(0);
   const [currentWord, setCurrentWord] = useState<string>("");
   const [doneWords, setDoneWords] = useState<Array<string>>(["start"]); // 0th round will always be the word "start"
+  const [wpm, setWpm] = useState<string>("0");
+  const [gameStartTime, setGameStartTime] = useState<number | undefined>(
+    undefined
+  );
   const [gameTime, setGameTime] = useState<number>(initialGameTimeInMs);
   const [gameTimeIntervalId, setGameTimeIntervalId] =
     useState<ReturnType<typeof setInterval>>(); // @ref https://stackoverflow.com/a/59681620/12278028
   const [isInGame, setIsInGame] = useState(false);
   const [isGameEnded, setIsGameEnded] = useState(false);
   const [isRecordSaved, setIsRecordSaved] = useState(false);
-
-  const [gameStartTime, setGameStartTime] = useState<number | undefined>(
-    undefined
-  );
-  const [wpm, setWpm] = useState<string>("0");
 
   const handleAdditionalGameTime = () => {
     // 1 in 10 chance to get extra 2 seconds
@@ -66,6 +65,9 @@ const Home: NextPage = () => {
 
   const handleStartGame = () => {
     // Reset game state
+    // These were not reset in handleEndGame() because
+    // we need to display the user statistics (ex. wpm)
+    // at the end of each game
     setIsGameEnded(false);
     setUserScore(0);
     setDoneWords([]);
@@ -91,14 +93,12 @@ const Home: NextPage = () => {
     setGameTimeIntervalId(undefined);
     setGameTime(initialGameTimeInMs);
 
-    setUserInput("");
     setCurrentWord("");
+    setUserInput("");
     setIsInGame(false);
     setIsGameEnded(true);
 
     setGameStartTime(undefined);
-
-    // Update high score
   };
 
   const handleSaveRecord = async () => {
@@ -130,13 +130,13 @@ const Home: NextPage = () => {
     }
 
     if (isInGame && !gameStartTime) {
-      setGameStartTime(CurrentTime());
+      setGameStartTime(CurrentTimeInMs());
     }
 
     if (isInGame && userInput.trim() === currentWord) {
       if (gameStartTime) {
         // @ref https://betterprogramming.pub/create-a-typing-game-with-react-hooks-usekeypress-and-faker-28bbc7919820
-        const durationInMinutes = (CurrentTime() - gameStartTime) / 60000.0;
+        const durationInMinutes = (CurrentTimeInMs() - gameStartTime) / 60000.0;
 
         setWpm(((doneWords.length + 1) / durationInMinutes).toFixed(2));
       }
@@ -155,6 +155,8 @@ const Home: NextPage = () => {
 
   return (
     <div>
+      {/* TODO - Add a visual indicator like +1 on every correct word (Mantine Tooltip?) */}
+
       <GameHeader
         isInGame={isInGame}
         isGameEnded={isGameEnded}
@@ -170,12 +172,12 @@ const Home: NextPage = () => {
         isInGame={isInGame}
       />
 
-      {/* TODO - Add a visual indicator like +1 on every correct word (Mantine Tooltip?) */}
+      {/* Word Input */}
       <Paper
         px="md"
         py="xs"
         my="md"
-        style={{ backgroundColor: "#101113" }}
+        style={{ backgroundColor: black }}
         withBorder
       >
         <Input
@@ -194,6 +196,7 @@ const Home: NextPage = () => {
         />
       </Paper>
 
+      {/* Save record button */}
       <Box mb={12}>
         {isGameEnded && !loading && !authUser && (
           <Link href="/sign-in" passHref>
@@ -203,15 +206,19 @@ const Home: NextPage = () => {
           </Link>
         )}
 
-        {isGameEnded && !loading && authUser && !isRecordSaved && (
-          <Button
-            color="gray"
-            onClick={handleSaveRecord}
-            leftIcon={<Plus size={12} />}
-          >
-            Save record
-          </Button>
-        )}
+        {isGameEnded &&
+          !loading &&
+          authUser &&
+          !isRecordSaved &&
+          userScore !== 0 && (
+            <Button
+              color="gray"
+              onClick={handleSaveRecord}
+              leftIcon={<Plus size={12} />}
+            >
+              Save record
+            </Button>
+          )}
       </Box>
 
       {/* Display done words for reference on how well a user did */}

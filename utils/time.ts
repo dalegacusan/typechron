@@ -1,1 +1,1 @@
-export const CurrentTime = () => new Date().getTime();
+export const CurrentTimeInMs = () => new Date().getTime();

@@ -105,7 +105,7 @@ export function PageHeader() {
               gutter={12}
               withArrow
             >
-              <Menu.Label>My Account</Menu.Label>
+              <Menu.Label>{authUser.username}</Menu.Label>
 
               <Menu.Item icon={<Logout size={14} />} onClick={() => signOut()}>
                 Sign out

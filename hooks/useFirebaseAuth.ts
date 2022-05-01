@@ -12,15 +12,21 @@ export interface FormattedUser {
   uid: string;
   displayName: string | null;
   email: string | null;
+  username?: string | null;
   photoUrl: string | null;
 }
 
-const formatAuthUser = (user: User): FormattedUser => ({
-  uid: user.uid,
-  displayName: user.displayName,
-  email: user.email,
-  photoUrl: user.photoURL,
-});
+const formatAuthUser = async (user: User): Promise<FormattedUser> => {
+  const loggedInUser = await getOneUserById(user.uid);
+
+  return {
+    uid: user.uid,
+    displayName: user.displayName,
+    email: user.email,
+    username: (loggedInUser?.username as string) || null,
+    photoUrl: user.photoURL,
+  };
+};
 
 export default function useFirebaseAuth() {
   const [authUser, setAuthUser] = useState<FormattedUser | null>(null);
@@ -35,12 +41,14 @@ export default function useFirebaseAuth() {
     const provider = new GoogleAuthProvider();
 
     const res = await signInWithPopup(firebaseAuth, provider);
-    const authUser = res.user;
+    const loggedInUser = res.user;
 
-    const user = await getOneUserById(authUser.uid);
+    if (loggedInUser) {
+      const user = await getOneUserById(loggedInUser.uid);
 
-    if (!user) {
-      await createUser(authUser.uid, authUser.email);
+      if (!user) {
+        await createUser(loggedInUser.uid, loggedInUser.email as string);
+      }
     }
 
     return res;
@@ -57,7 +65,7 @@ export default function useFirebaseAuth() {
 
     setLoading(true);
 
-    const formattedUser = formatAuthUser(authState);
+    const formattedUser = await formatAuthUser(authState);
 
     setAuthUser(formattedUser);
     setLoading(false);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../ contexts/authUserContext";
 import { Box, Center, Loader, Paper, Text, Title } from "@mantine/core";
+import { red } from "../config";
 import GoogleLoginButton from "../components/social-login-buttons/google-login-btn";
 import Link from "next/link";
 
@@ -9,13 +10,10 @@ const SignIn = () => {
   const [isSignInError, setIsSignInError] = useState<boolean>(false);
 
   const signIn = async () => {
-    const { user, error } = await signInWithGoogle();
+    const { code } = await signInWithGoogle();
 
-    // TODO - Not working (app does not reach here)
-    if (error) {
+    if (code) {
       setIsSignInError(true);
-
-      return;
     }
   };
 
@@ -69,15 +67,19 @@ const SignIn = () => {
             </>
           )}
 
-          {!loading && authUser && (
+          {!isSignInError && !loading && authUser && (
             <Text color="dimmed" size="sm" align="center" mt={5}>
               You are already signed in.
             </Text>
           )}
+
+          {isSignInError && (
+            <Text color={red} align="center">
+              Failed to sign in.
+            </Text>
+          )}
         </Paper>
       </Center>
-
-      {isSignInError && <p>Failed to sign in.</p>}
     </Box>
   );
 };
