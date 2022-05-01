@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Alert,
   Code,
@@ -5,10 +6,10 @@ import {
   Modal,
   Space,
   Text,
+  Tooltip,
   useMantineTheme,
 } from "@mantine/core";
-import React from "react";
-import { InfoCircle } from "tabler-icons-react";
+import { BrandGithub, InfoCircle } from "tabler-icons-react";
 
 interface HelpModalProps {
   isOpenModal: boolean;
@@ -58,14 +59,15 @@ const HelpModal = (props: HelpModalProps) => {
       <Space h="sm" />
 
       <Text align="right">
-        <Text
-          variant="link"
-          component="a"
-          href="https://github.com/dalegacusan/typing-game"
-          target="_blank"
-        >
-          github
-        </Text>
+        <Tooltip label="Github" withArrow>
+          <a
+            href="https://github.com/dalegacusan/typing-game"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <BrandGithub size={22} color="gray" />
+          </a>
+        </Tooltip>
       </Text>
     </Modal>
   );

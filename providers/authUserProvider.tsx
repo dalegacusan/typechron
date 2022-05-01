@@ -2,7 +2,11 @@ import React from "react";
 import { AuthUserContext } from "../ contexts/authUserContext";
 import useFirebaseAuth from "../hooks/useFirebaseAuth";
 
-const AuthUserProvider = ({ children }) => {
+interface AuthUserProviderProps {
+  children: JSX.Element[] | JSX.Element;
+}
+
+const AuthUserProvider = ({ children }: AuthUserProviderProps) => {
   const auth = useFirebaseAuth();
 
   return (

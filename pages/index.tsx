@@ -154,8 +154,10 @@ const Home: NextPage = () => {
           size="lg"
           placeholder={isInGame ? currentWord : "start"}
           value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          onPaste={(e) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUserInput(e.target.value)
+          }
+          onPaste={(e: React.FormEvent<HTMLInputElement>) => {
             e.preventDefault();
             return false;
           }} // Prevent pasting in input
@@ -165,14 +167,11 @@ const Home: NextPage = () => {
 
       <Box mb={12}>
         {isGameEnded && !loading && !authUser && (
-          <Text>
-            <Link href="/login" passHref>
-              <Text component="a" variant="link">
-                Sign-in
-              </Text>
-            </Link>{" "}
-            to save your record.
-          </Text>
+          <Link href="/sign-in" passHref>
+            <Text component="a" variant="link">
+              Sign in to save your record
+            </Text>
+          </Link>
         )}
 
         {isGameEnded && !loading && authUser && (
