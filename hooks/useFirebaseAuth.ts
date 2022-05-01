@@ -16,14 +16,11 @@ export interface FormattedUser {
   photoUrl: string | null;
 }
 
-const formatAuthUser = async (user: User): Promise<FormattedUser> => {
-  const loggedInUser = await getOneUserById(user.uid);
-
+const formatAuthUser = (user: User): FormattedUser => {
   return {
     uid: user.uid,
     displayName: user.displayName,
     email: user.email,
-    username: (loggedInUser?.username as string) || null,
     photoUrl: user.photoURL,
   };
 };
@@ -47,7 +44,22 @@ export default function useFirebaseAuth() {
       const user = await getOneUserById(loggedInUser.uid);
 
       if (!user) {
-        await createUser(loggedInUser.uid, loggedInUser.email as string);
+        const newUser = await createUser(
+          loggedInUser.uid,
+          loggedInUser.email as string
+        );
+
+        // @ts-ignore
+        setAuthUser((prev) => ({
+          ...prev,
+          username: newUser.username as string,
+        }));
+      } else {
+        // @ts-ignore
+        setAuthUser((prev) => ({
+          ...prev,
+          username: user.username,
+        }));
       }
     }
 
@@ -65,9 +77,9 @@ export default function useFirebaseAuth() {
 
     setLoading(true);
 
-    const formattedUser = await formatAuthUser(authState);
+    const formattedUser = formatAuthUser(authState);
 
-    setAuthUser(formattedUser);
+    setAuthUser((prev) => ({ ...prev, ...formattedUser }));
     setLoading(false);
   };
 

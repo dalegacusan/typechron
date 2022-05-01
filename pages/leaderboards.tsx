@@ -1,10 +1,10 @@
-import { Box, Modal, Stack, Text, Title } from "@mantine/core";
-import { GetServerSidePropsContext } from "next";
 import React, { useEffect, useState } from "react";
-import GameWordsModal from "../components/game-words-modal";
-import LeaderboardContent from "../components/leaderboard-content";
+import { Box, Stack, Title } from "@mantine/core";
+import { GetServerSidePropsContext } from "next";
 import { Game } from "../interfaces/game.interface";
 import { getTop20Games } from "../utils/firebase-functions";
+import GameWordsModal from "../components/game-words-modal";
+import LeaderboardContent from "../components/leaderboard-content";
 
 const Leaderboards = (props) => {
   const [isWordsModalOpened, setIsWordsModalOpened] = useState<boolean>(false);

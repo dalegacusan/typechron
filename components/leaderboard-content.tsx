@@ -1,5 +1,6 @@
-import { Box, SimpleGrid, Text } from "@mantine/core";
 import React from "react";
+import { Box, SimpleGrid, Text } from "@mantine/core";
+import { useAuth } from "../ contexts/authUserContext";
 import { Game } from "../interfaces/game.interface";
 
 interface GameContentProps {
@@ -9,6 +10,7 @@ interface GameContentProps {
 }
 
 const LeaderboardContent = (props: GameContentProps) => {
+  const { authUser } = useAuth();
   const { index, game, handleContentClick } = props;
   const { points, user, words, wpm } = game;
 
@@ -47,7 +49,8 @@ const LeaderboardContent = (props: GameContentProps) => {
       <SimpleGrid cols={2}>
         <Box>
           <Text size="sm">
-            {index + 1}. {user.username}
+            {index + 1}. {user.username}{" "}
+            {authUser && authUser.uid === user.id && "(you)"}
           </Text>
         </Box>
         <Box>
