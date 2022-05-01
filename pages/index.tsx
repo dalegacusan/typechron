@@ -13,6 +13,7 @@ import CurrentWord from "../components/current-word";
 import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
 import Link from "next/link";
+import DoneWords from "../components/done-words";
 
 const Home: NextPage = () => {
   const { authUser, loading } = useAuth();
@@ -103,7 +104,13 @@ const Home: NextPage = () => {
 
   const handleSaveRecord = async () => {
     const newGameRecord: Game = await createGame({
-      userId: authUser.uid,
+      // because user can only save a record if he is logged in
+      user: {
+        // @ts-ignore
+        id: authUser.uid,
+        // @ts-ignore
+        username: authUser.username,
+      },
       round: doneWords.length - 1,
       points: userScore,
       wpm: Number(wpm),
@@ -154,7 +161,7 @@ const Home: NextPage = () => {
   }, [gameTime]);
 
   return (
-    <div>
+    <Box>
       {/* TODO - Add a visual indicator like +1 on every correct word (Mantine Tooltip?) */}
 
       <GameHeader
@@ -223,24 +230,9 @@ const Home: NextPage = () => {
 
       {/* Display done words for reference on how well a user did */}
       <Box>
-        {doneWords.map((word: string, idx: number) => {
-          const isNewWord = doneWords.length - 1 === idx;
-          const withComma = doneWords.length - 2 === idx;
-
-          // Don't display the new word that hasn't been finished yet
-          if (isNewWord) {
-            return null;
-          }
-
-          return (
-            <Text key={idx} component="span">
-              {word}
-              {withComma ? "" : ", "}
-            </Text>
-          );
-        })}
+        <DoneWords words={doneWords} />
       </Box>
-    </div>
+    </Box>
   );
 };
 

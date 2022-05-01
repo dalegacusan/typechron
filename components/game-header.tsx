@@ -38,7 +38,9 @@ const GameHeader = (props: GameHeaderProps) => {
           {!isGameEnded && `Round ${round}`}
           {/* Display "Game Ended" */}
           {/* Should not include the last word (which is a new word) */}
-          {!isInGame && isGameEnded && `Game Over - Round ${round - 1}`}
+          {!isInGame &&
+            isGameEnded &&
+            `Game Over - Round ${round === 1 ? 1 : round - 1}`}
         </Text>
       </Grid.Col>
     </Grid>

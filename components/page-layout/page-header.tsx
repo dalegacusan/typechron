@@ -63,22 +63,23 @@ export function PageHeader() {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
 
   return (
-    <Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
+    <Header height={HEADER_HEIGHT} mb={70} className={classes.root}>
       <HelpModal isOpenModal={isOpenModal} setIsOpenModal={setIsOpenModal} />
       <Container size="sm" className={classes.header}>
-        <Indicator inline label="v1" color="gray" size={16}>
-          <Link href="/" passHref>
-            <Title order={3} style={{ cursor: "pointer" }}>
-              Typechron
-            </Title>
-          </Link>
-        </Indicator>
+        <Link href="/" passHref>
+          <Title order={3} style={{ cursor: "pointer" }}>
+            Typechron
+          </Title>
+        </Link>
 
         <Group spacing={5}>
           <a className={classes.link} onClick={() => setIsOpenModal(true)}>
             Help
           </a>
-          <a className={classes.link} onClick={() => {}}>
+          <a
+            className={classes.link}
+            onClick={() => router.push("/leaderboards")}
+          >
             Leaderboards
           </a>
 
@@ -103,6 +104,7 @@ export function PageHeader() {
               }
               ml={8}
               gutter={12}
+              placement="end"
               withArrow
             >
               <Menu.Label>{authUser.username}</Menu.Label>

@@ -1,4 +1,12 @@
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { GenerateWord } from "./words";
 import { Game } from "../interfaces/game.interface";
@@ -46,7 +54,7 @@ export const createUser = async (
 export const createGame = async (game: Game) => {
   const newGame: Game = {
     id: uuidv4(),
-    userId: game.userId,
+    user: game.user,
     round: game.round,
     points: game.points,
     wpm: game.wpm,
@@ -56,4 +64,15 @@ export const createGame = async (game: Game) => {
   await addDoc(collection(firebaseDb, "games"), newGame);
 
   return newGame;
+};
+
+export const getTop20Games = async () => {
+  const gamesRef = collection(firebaseDb, "games");
+  const q = query(gamesRef, orderBy("points", "desc"), limit(10));
+
+  const gamesSnap = await getDocs(q);
+
+  return gamesSnap.docs.map((game) => {
+    return game.data();
+  });
 };

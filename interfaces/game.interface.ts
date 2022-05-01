@@ -1,6 +1,9 @@
 export interface Game {
   id?: string;
-  userId: string;
+  user: {
+    id: string;
+    username: string;
+  };
   round: number;
   points: number;
   wpm: number;
