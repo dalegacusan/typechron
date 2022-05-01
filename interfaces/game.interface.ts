@@ -1,5 +1,5 @@
-interface Game {
-  id: string;
+export interface Game {
+  id?: string;
   userId: string;
   round: number;
   points: number;

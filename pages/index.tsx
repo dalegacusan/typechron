@@ -5,6 +5,10 @@ import { CurrentTime } from "../utils/time";
 import { initialGameTimeInMs } from "../config";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
+import { createGame } from "../utils/firebase-functions";
+import { Game } from "../interfaces/game.interface";
+import { Check, Plus } from "tabler-icons-react";
+import { showNotification } from "@mantine/notifications";
 import CurrentWord from "../components/current-word";
 import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
@@ -22,6 +26,7 @@ const Home: NextPage = () => {
     useState<ReturnType<typeof setInterval>>(); // @ref https://stackoverflow.com/a/59681620/12278028
   const [isInGame, setIsInGame] = useState(false);
   const [isGameEnded, setIsGameEnded] = useState(false);
+  const [isRecordSaved, setIsRecordSaved] = useState(false);
 
   const [gameStartTime, setGameStartTime] = useState<number | undefined>(
     undefined
@@ -65,6 +70,7 @@ const Home: NextPage = () => {
     setUserScore(0);
     setDoneWords([]);
     setWpm("0");
+    setIsRecordSaved(false);
 
     setIsInGame(true);
 
@@ -93,6 +99,29 @@ const Home: NextPage = () => {
     setGameStartTime(undefined);
 
     // Update high score
+  };
+
+  const handleSaveRecord = async () => {
+    const newGameRecord: Game = await createGame({
+      userId: authUser.uid,
+      round: doneWords.length - 1,
+      points: userScore,
+      wpm: Number(wpm),
+      words: doneWords,
+    });
+
+    if (newGameRecord.id) {
+      setIsRecordSaved(true);
+
+      showNotification({
+        id: "saved-record",
+        autoClose: 5000,
+        title: "Record saved!",
+        message: "Did you make it to the leaderboards?",
+        color: "green",
+        icon: <Check />,
+      });
+    }
   };
 
   useEffect(() => {
@@ -174,8 +203,14 @@ const Home: NextPage = () => {
           </Link>
         )}
 
-        {isGameEnded && !loading && authUser && (
-          <Button color="gray">Save record</Button>
+        {isGameEnded && !loading && authUser && !isRecordSaved && (
+          <Button
+            color="gray"
+            onClick={handleSaveRecord}
+            leftIcon={<Plus size={12} />}
+          >
+            Save record
+          </Button>
         )}
       </Box>
 
