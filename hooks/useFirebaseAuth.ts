@@ -1,11 +1,12 @@
+import { useState, useEffect } from "react";
 import {
   getAuth,
   GoogleAuthProvider,
-  signInWithRedirect,
+  signInWithPopup,
   User,
 } from "firebase/auth";
-import { useState, useEffect } from "react";
-import { firebaseApp } from "../config/firebase";
+import { firebaseAuth } from "../config/firebase-app";
+import { createUser, getOneUserById } from "../utils/firebase-functions";
 
 export interface FormattedUser {
   uid: string;
@@ -31,10 +32,18 @@ export default function useFirebaseAuth() {
   };
 
   const signInWithGoogle = async () => {
-    const firebaseAuth = getAuth(firebaseApp);
     const provider = new GoogleAuthProvider();
 
-    return signInWithRedirect(firebaseAuth, provider);
+    const res = await signInWithPopup(firebaseAuth, provider);
+    const authUser = res.user;
+
+    const user = await getOneUserById(authUser.uid);
+
+    if (!user) {
+      await createUser(authUser.uid, authUser.email);
+    }
+
+    return res;
   };
 
   const signOut = () => getAuth().signOut().then(resetState);
