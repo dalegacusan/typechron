@@ -1,4 +1,4 @@
-export const gameInitialTimeInMs = 10000;
+export const initialGameTimeInMs = 10000;
 
 export const black = "#101113";
 export const green = "#82c91e";

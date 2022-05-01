@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTime } from "../utils/time";
-import { gameInitialTimeInMs } from "../config";
+import { initialGameTimeInMs } from "../config";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import CurrentWord from "../components/current-word";
@@ -16,8 +16,8 @@ const Home: NextPage = () => {
   const [userInput, setUserInput] = useState<string>("");
   const [userScore, setUserScore] = useState<number>(0);
   const [currentWord, setCurrentWord] = useState<string>("");
-  const [doneWords, setDoneWords] = useState<Array<string>>([]);
-  const [gameTime, setGameTime] = useState<number>(gameInitialTimeInMs);
+  const [doneWords, setDoneWords] = useState<Array<string>>(["start"]); // 0th round will always be the word "start"
+  const [gameTime, setGameTime] = useState<number>(initialGameTimeInMs);
   const [gameTimeIntervalId, setGameTimeIntervalId] =
     useState<ReturnType<typeof setInterval>>(); // @ref https://stackoverflow.com/a/59681620/12278028
   const [isInGame, setIsInGame] = useState(false);
@@ -83,7 +83,7 @@ const Home: NextPage = () => {
     }
 
     setGameTimeIntervalId(undefined);
-    setGameTime(gameInitialTimeInMs);
+    setGameTime(initialGameTimeInMs);
 
     setUserInput("");
     setCurrentWord("");

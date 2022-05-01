@@ -1,6 +1,6 @@
 import React from "react";
 import Countdown from "react-countdown";
-import { gameInitialTimeInMs } from "../config";
+import { initialGameTimeInMs } from "../config";
 import { Grid, Text } from "@mantine/core";
 import GameTime from "./game-time";
 
@@ -28,16 +28,17 @@ const GameHeader = (props: GameHeaderProps) => {
             />
           ) : (
             // Display default time
-            `${gameInitialTimeInMs / 1000.0}:00s` // @ref https://stackoverflow.com/a/14090907/12278028
+            `${initialGameTimeInMs / 1000.0}:00s` // @ref https://stackoverflow.com/a/14090907/12278028
           )}
         </Text>
       </Grid.Col>
       <Grid.Col span={4}>
         <Text size="xl" align="right">
           {/* Display Round */}
-          {!isGameEnded && `Round ${round + 1}`}
+          {!isGameEnded && `Round ${round}`}
           {/* Display "Game Ended" */}
-          {!isInGame && isGameEnded && `Game Over - Round ${round + 1}`}
+          {/* Should not include the last word (which is a new word) */}
+          {!isInGame && isGameEnded && `Game Over - Round ${round - 1}`}
         </Text>
       </Grid.Col>
     </Grid>
