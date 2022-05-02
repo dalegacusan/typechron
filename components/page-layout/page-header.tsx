@@ -11,10 +11,10 @@ import {
   ActionIcon,
   Group,
 } from "@mantine/core";
-import HelpModal from "../help-modal";
+import HelpModal from "../modals/help-modal";
 import { useAuth } from "../../ contexts/authUserContext";
 import { useRouter } from "next/router";
-import { Logout } from "tabler-icons-react";
+import { Archive, Logout } from "tabler-icons-react";
 import Link from "next/link";
 
 const HEADER_HEIGHT = 70;
@@ -109,7 +109,18 @@ export function PageHeader() {
             >
               <Menu.Label>{authUser.username}</Menu.Label>
 
-              <Menu.Item icon={<Logout size={14} />} onClick={() => signOut()}>
+              <Menu.Item
+                icon={<Archive size={14} />}
+                onClick={() => router.push("/account")}
+              >
+                My Account
+              </Menu.Item>
+
+              <Menu.Item
+                color="red"
+                icon={<Logout size={14} />}
+                onClick={() => signOut()}
+              >
                 Sign out
               </Menu.Item>
             </Menu>

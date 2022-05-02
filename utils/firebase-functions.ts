@@ -25,6 +25,21 @@ export const getOneUserById = async (id: string) => {
   return userSnap.docs[0].data();
 };
 
+export const getAllGamesByUserId = async (id: string) => {
+  const gamesRef = collection(firebaseDb, "games");
+  const q = query(
+    gamesRef,
+    where("user.id", "==", id), // @ref https://stackoverflow.com/a/62626994/12278028
+    orderBy("dateCreated", "desc"),
+    limit(10)
+  );
+  const gamesSnap = await getDocs(q);
+
+  return gamesSnap.docs.map((game) => {
+    return game.data();
+  });
+};
+
 export const getTop20Games = async () => {
   const gamesRef = collection(firebaseDb, "games");
   const q = query(gamesRef, orderBy("points", "desc"), limit(10));

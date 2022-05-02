@@ -30,7 +30,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
       )}
 
       <Title order={2}>Leaderboards</Title>
-      <Text size="sm" color="dimmed">
+      <Text size="sm" color="dimmed" mt={4}>
         Click on a record for more information
       </Text>
 
@@ -50,6 +50,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
                   index={idx}
                   game={game}
                   handleContentClick={() => handleContentClick(game)}
+                  isLeaderboard={true}
                 />
               );
             })}

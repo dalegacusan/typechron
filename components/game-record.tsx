@@ -7,11 +7,12 @@ interface GameRecordProps {
   index: number;
   game: Game;
   handleContentClick: (words: string[]) => void;
+  isLeaderboard: boolean;
 }
 
 const GameRecord = (props: GameRecordProps) => {
   const { authUser } = useAuth();
-  const { index, game, handleContentClick } = props;
+  const { index, game, handleContentClick, isLeaderboard } = props;
   const { points, user, words, wpm } = game;
 
   return (
@@ -20,20 +21,25 @@ const GameRecord = (props: GameRecordProps) => {
         let bgColor = theme.colors.dark[6];
         let hoverColor = theme.colors.dark[5];
 
-        if (index === 0) {
-          bgColor = theme.colors.lime[4];
-          hoverColor = theme.colors.lime[5];
-        } else if (index === 1) {
-          bgColor = theme.colors.orange[4];
-          hoverColor = theme.colors.orange[5];
-        } else if (index === 2) {
-          bgColor = theme.colors.yellow[2];
-          hoverColor = theme.colors.yellow[3];
+        if (isLeaderboard) {
+          if (index === 0) {
+            bgColor = theme.colors.lime[4];
+            hoverColor = theme.colors.lime[5];
+          } else if (index === 1) {
+            bgColor = theme.colors.orange[4];
+            hoverColor = theme.colors.orange[5];
+          } else if (index === 2) {
+            bgColor = theme.colors.yellow[2];
+            hoverColor = theme.colors.yellow[3];
+          }
         }
 
         return {
           backgroundColor: bgColor,
-          color: index < 3 ? theme.colors.dark[9] : theme.colors.dark[0],
+          color:
+            isLeaderboard && index < 3
+              ? theme.colors.dark[9]
+              : theme.colors.dark[0],
           padding: theme.spacing.xs,
           paddingLeft: theme.spacing.lg,
           paddingRight: theme.spacing.lg,
@@ -49,10 +55,13 @@ const GameRecord = (props: GameRecordProps) => {
       <Group grow>
         <Box>
           <Text size="sm">
-            {index + 1}.{" "}
+            {isLeaderboard && `${index + 1}. `}
+
             {authUser && authUser.uid === user.id
-              ? `${authUser.username} (you)`
+              ? `${authUser.username}`
               : user.username}
+
+            {authUser && authUser.uid === user.id && isLeaderboard && ` (you)`}
           </Text>
         </Box>
         <Box>
