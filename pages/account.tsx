@@ -3,9 +3,9 @@ import { Box, Loader, Stack, Text, Title } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { getAllGamesByUserId } from "../utils/firebase-functions";
 import { Game } from "../interfaces/game.interface";
-import Link from "next/link";
 import GameModal from "../components/modals/game-modal";
 import GameRecord from "../components/game-record";
+import PageNotFound from "./404";
 
 const UserAccount = () => {
   const { authUser, loading } = useAuth();
@@ -46,18 +46,7 @@ const UserAccount = () => {
 
       {!loading && !authUser && (
         <>
-          <Text component="span" color="red">
-            Unauthorized access.
-          </Text>
-          <Text>
-            You do not have the permission to view this page. Please{" "}
-            <Link href="/sign-in" passHref>
-              <Text component="a" variant="link">
-                sign in
-              </Text>
-            </Link>{" "}
-            with your account.
-          </Text>
+          <PageNotFound />
         </>
       )}
 
