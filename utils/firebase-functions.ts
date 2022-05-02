@@ -10,7 +10,7 @@ import {
   where,
 } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
-import { GenerateWord } from "./words";
+import { GenerateUsername } from "./words";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
 import { v4 as uuidv4 } from "uuid";
@@ -38,10 +38,7 @@ export const createUser = async (
   email: string,
   username?: string
 ): Promise<{ user: User }> => {
-  const randomWord = GenerateWord();
-  const capitalizedFirstLetter =
-    randomWord.charAt(0).toUpperCase() + randomWord.slice(1);
-  const defaultUsername = "Guest " + capitalizedFirstLetter;
+  const defaultUsername = GenerateUsername();
 
   const newUser: User = {
     id,
