@@ -12,6 +12,11 @@ interface GameModalProps {
 const GameModal = (props: GameModalProps) => {
   const { game, isGameModalOpened, setIsGameModalOpened } = props;
 
+  let date = new Date(game.dateCreated as number);
+  let year = date.getFullYear(); // 2020
+  let month = (date.getMonth() + 1).toString().padStart(2, "0"); // "04"
+  let day = date.getDate().toString().padStart(2, "0"); // "09"
+
   return (
     <Modal
       opened={isGameModalOpened}
@@ -32,7 +37,7 @@ const GameModal = (props: GameModalProps) => {
           Round {game.round}
         </Text>
         <Text size="sm" color="dimmed" align="right">
-          {game.dateCreated.toString()}
+          {`${month}/${day}/${year}`}
         </Text>
       </Group>
     </Modal>

@@ -25,6 +25,17 @@ export const getOneUserById = async (id: string) => {
   return userSnap.docs[0].data();
 };
 
+export const getTop20Games = async () => {
+  const gamesRef = collection(firebaseDb, "games");
+  const q = query(gamesRef, orderBy("points", "desc"), limit(10));
+
+  const gamesSnap = await getDocs(q);
+
+  return gamesSnap.docs.map((game) => {
+    return game.data();
+  });
+};
+
 export const createUser = async (
   id: string,
   email: string,
@@ -59,27 +70,10 @@ export const createGame = async (game: Game) => {
     points: game.points,
     wpm: game.wpm,
     words: game.words,
-    dateCreated: game.dateCreated,
+    dateCreated: Date.now(),
   };
 
   await addDoc(collection(firebaseDb, "games"), newGame);
 
   return newGame;
-};
-
-export const getTop20Games = async () => {
-  const gamesRef = collection(firebaseDb, "games");
-  const q = query(gamesRef, orderBy("points", "desc"), limit(10));
-
-  const gamesSnap = await getDocs(q);
-
-  return gamesSnap.docs.map((game) => {
-    const dateCreated = game.data().dateCreated;
-
-    return {
-      ...game.data(),
-      // Change firestore date to javascript date
-      dateCreated: new Date(dateCreated.seconds * 1000).toLocaleDateString(),
-    };
-  });
 };

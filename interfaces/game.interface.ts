@@ -8,5 +8,7 @@ export interface Game {
   points: number;
   wpm: number;
   words: string[];
-  dateCreated: Date;
+  // Store as unix timestamp
+  // Optional because server should be the one creating timestamp
+  dateCreated?: number;
 }
