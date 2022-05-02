@@ -1,15 +1,15 @@
 import React from "react";
-import { Box, SimpleGrid, Text } from "@mantine/core";
+import { Box, Group, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { Game } from "../interfaces/game.interface";
 
-interface GameContentProps {
+interface GameRecordProps {
   index: number;
   game: Game;
   handleContentClick: (words: string[]) => void;
 }
 
-const LeaderboardContent = (props: GameContentProps) => {
+const GameRecord = (props: GameRecordProps) => {
   const { authUser } = useAuth();
   const { index, game, handleContentClick } = props;
   const { points, user, words, wpm } = game;
@@ -46,30 +46,28 @@ const LeaderboardContent = (props: GameContentProps) => {
       }}
       onClick={() => handleContentClick(words)}
     >
-      <SimpleGrid cols={2}>
+      <Group grow>
         <Box>
           <Text size="sm">
-            {index + 1}. {user.username}{" "}
-            {authUser && authUser.uid === user.id && "(you)"}
+            {index + 1}.{" "}
+            {authUser && authUser.uid === user.id
+              ? `${authUser.username} (you)`
+              : user.username}
           </Text>
         </Box>
         <Box>
-          <SimpleGrid cols={2} spacing="xs">
-            <Box>
-              <Text size="sm" align="right">
-                {wpm} wpm
-              </Text>
-            </Box>
-            <Box>
-              <Text size="sm" align="right">
-                {points} points
-              </Text>
-            </Box>
-          </SimpleGrid>
+          <Group grow>
+            <Text size="sm" align="right">
+              {wpm} wpm
+            </Text>
+            <Text size="sm" align="right">
+              {points} points
+            </Text>
+          </Group>
         </Box>
-      </SimpleGrid>
+      </Group>
     </Box>
   );
 };
 
-export default LeaderboardContent;
+export default GameRecord;

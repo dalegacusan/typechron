@@ -8,4 +8,5 @@ export interface Game {
   points: number;
   wpm: number;
   words: string[];
+  dateCreated: Date;
 }

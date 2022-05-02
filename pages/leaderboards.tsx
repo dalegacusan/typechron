@@ -1,47 +1,61 @@
-import React, { useEffect, useState } from "react";
-import { Box, Stack, Title } from "@mantine/core";
+import React, { useState } from "react";
+import { Box, Loader, Stack, Text, Title } from "@mantine/core";
 import { GetServerSidePropsContext } from "next";
 import { Game } from "../interfaces/game.interface";
 import { getTop20Games } from "../utils/firebase-functions";
-import GameWordsModal from "../components/game-words-modal";
-import LeaderboardContent from "../components/leaderboard-content";
+import GameModal from "../components/modals/game-modal";
+import GameRecord from "../components/game-record";
 
-const Leaderboards = (props) => {
-  const [isWordsModalOpened, setIsWordsModalOpened] = useState<boolean>(false);
-  const [wordsToDisplay, setWordsToDisplay] = useState<string[]>([]);
+interface LeaderboardsProps {
+  games: Game[];
+}
 
-  const handleContentClick = (words: string[]) => {
-    setWordsToDisplay(words);
-    setIsWordsModalOpened(true);
+const Leaderboards = (props: LeaderboardsProps) => {
+  const [isGameModalOpened, setIsGameModalOpened] = useState<boolean>(false);
+  const [gameToDisplay, setGameToDisplay] = useState<Game>();
+
+  const handleContentClick = (game: Game) => {
+    setGameToDisplay(game);
+    setIsGameModalOpened(true);
   };
-
-  useEffect(() => {}, [props]);
-
-  if (!props.games) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <Box mb={70}>
-      <GameWordsModal
-        words={wordsToDisplay}
-        isWordsModalOpened={isWordsModalOpened}
-        setIsWordsModalOpened={setIsWordsModalOpened}
-      />
-      <Title order={2}>Leaderboards</Title>
+      {gameToDisplay && (
+        <GameModal
+          game={gameToDisplay}
+          isGameModalOpened={isGameModalOpened}
+          setIsGameModalOpened={setIsGameModalOpened}
+        />
+      )}
 
-      <Stack mt={30}>
-        {props.games.map((game: Game, idx: number) => {
-          return (
-            <LeaderboardContent
-              key={idx}
-              index={idx}
-              game={game}
-              handleContentClick={handleContentClick}
-            />
-          );
-        })}
-      </Stack>
+      <Title order={2}>Leaderboards</Title>
+      <Text size="sm" color="dimmed">
+        Click on a record for more information
+      </Text>
+
+      <Box mt={30}>
+        {!props.games && <Loader size="sm" />}
+
+        {props.games && props.games.length === 0 && (
+          <Text color="dimmed">No available data</Text>
+        )}
+
+        {props.games && props.games.length !== 0 && (
+          <Stack>
+            {props.games.map((game: Game, idx: number) => {
+              return (
+                <GameRecord
+                  key={idx}
+                  index={idx}
+                  game={game}
+                  handleContentClick={() => handleContentClick(game)}
+                />
+              );
+            })}
+          </Stack>
+        )}
+      </Box>
     </Box>
   );
 };

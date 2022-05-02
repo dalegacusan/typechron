@@ -59,6 +59,7 @@ export const createGame = async (game: Game) => {
     points: game.points,
     wpm: game.wpm,
     words: game.words,
+    dateCreated: game.dateCreated,
   };
 
   await addDoc(collection(firebaseDb, "games"), newGame);
@@ -73,6 +74,12 @@ export const getTop20Games = async () => {
   const gamesSnap = await getDocs(q);
 
   return gamesSnap.docs.map((game) => {
-    return game.data();
+    const dateCreated = game.data().dateCreated;
+
+    return {
+      ...game.data(),
+      // Change firestore date to javascript date
+      dateCreated: new Date(dateCreated.seconds * 1000).toLocaleDateString(),
+    };
   });
 };

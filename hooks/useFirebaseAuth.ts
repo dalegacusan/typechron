@@ -54,12 +54,6 @@ export default function useFirebaseAuth() {
           ...prev,
           username: newUser.username as string,
         }));
-      } else {
-        // @ts-ignore
-        setAuthUser((prev) => ({
-          ...prev,
-          username: user.username,
-        }));
       }
     }
 
@@ -78,8 +72,12 @@ export default function useFirebaseAuth() {
     setLoading(true);
 
     const formattedUser = formatAuthUser(authState);
+    const user = await getOneUserById(formattedUser.uid); // Retrieve user to get username
 
-    setAuthUser((prev) => ({ ...prev, ...formattedUser }));
+    setAuthUser((prev) => ({
+      ...formattedUser,
+      username: user?.username as string,
+    }));
     setLoading(false);
   };
 

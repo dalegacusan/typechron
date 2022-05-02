@@ -115,6 +115,7 @@ const Home: NextPage = () => {
       points: userScore,
       wpm: Number(wpm),
       words: doneWords,
+      dateCreated: new Date(),
     });
 
     if (newGameRecord.id) {
