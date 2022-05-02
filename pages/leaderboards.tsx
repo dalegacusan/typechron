@@ -64,7 +64,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
 export default Leaderboards;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const games = await getGames(10);
+  const { games } = await getGames(10);
 
   return {
     props: { games },

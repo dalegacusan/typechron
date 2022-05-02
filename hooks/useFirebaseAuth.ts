@@ -41,10 +41,10 @@ export default function useFirebaseAuth() {
     const loggedInUser = res.user;
 
     if (loggedInUser) {
-      const user = await getOneUserById(loggedInUser.uid);
+      const { user } = await getOneUserById(loggedInUser.uid);
 
       if (!user) {
-        const newUser = await createUser(
+        const { user: newUser } = await createUser(
           loggedInUser.uid,
           loggedInUser.email as string
         );
@@ -72,7 +72,7 @@ export default function useFirebaseAuth() {
     setLoading(true);
 
     const formattedUser = formatAuthUser(authState);
-    const user = await getOneUserById(formattedUser.uid); // Retrieve user to get username
+    const { user } = await getOneUserById(formattedUser.uid); // Retrieve user to get username
 
     setAuthUser((prev) => ({
       ...formattedUser,

@@ -86,7 +86,7 @@ export function PageHeader() {
           {loading && !authUser && <Loader size="sm" />}
 
           {!loading && !authUser && (
-            <a className={classes.link} onClick={() => router.push("/sign-in")}>
+            <a className={classes.link} onClick={() => router.push("/login")}>
               Sign in
             </a>
           )}

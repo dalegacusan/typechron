@@ -103,7 +103,7 @@ const Home: NextPage = () => {
   };
 
   const handleSaveRecord = async () => {
-    const newGameRecord: Game = await createGame({
+    const { game: newGameRecord } = await createGame({
       // because user can only save a record if he is logged in
       user: {
         // @ts-ignore
@@ -206,7 +206,7 @@ const Home: NextPage = () => {
       {/* Save record button */}
       <Box mb={12}>
         {isGameEnded && !loading && !authUser && (
-          <Link href="/sign-in" passHref>
+          <Link href="/login" passHref>
             <Text component="a" variant="link">
               Sign in to save your record
             </Text>
