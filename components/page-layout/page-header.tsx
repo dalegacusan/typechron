@@ -4,17 +4,16 @@ import {
   Header,
   Container,
   Title,
-  Indicator,
   Avatar,
   Loader,
   Menu,
   ActionIcon,
   Group,
 } from "@mantine/core";
-import HelpModal from "../modals/help-modal";
 import { useAuth } from "../../ contexts/authUserContext";
 import { useRouter } from "next/router";
-import { Archive, Logout } from "tabler-icons-react";
+import { Logout, User } from "tabler-icons-react";
+import HelpModal from "../modals/help-modal";
 import Link from "next/link";
 
 const HEADER_HEIGHT = 70;
@@ -110,7 +109,7 @@ export function PageHeader() {
               <Menu.Label>{authUser.username}</Menu.Label>
 
               <Menu.Item
-                icon={<Archive size={14} />}
+                icon={<User size={14} />}
                 onClick={() => router.push("/account")}
               >
                 My Account
