@@ -5,6 +5,7 @@ import {
   limit,
   orderBy,
   query,
+  startAfter,
   where,
 } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
@@ -25,13 +26,24 @@ export const getOneUserById = async (id: string) => {
   return userSnap.docs[0].data();
 };
 
-export const getAllGamesByUserId = async (id: string) => {
+export const getGames = async (docsLimit: number) => {
+  const gamesRef = collection(firebaseDb, "games");
+  const q = query(gamesRef, orderBy("points", "desc"), limit(docsLimit));
+
+  const gamesSnap = await getDocs(q);
+
+  return gamesSnap.docs.map((game) => {
+    return game.data();
+  });
+};
+
+export const getGamesByUserId = async (id: string, docsLimit: number) => {
   const gamesRef = collection(firebaseDb, "games");
   const q = query(
     gamesRef,
     where("user.id", "==", id), // @ref https://stackoverflow.com/a/62626994/12278028
     orderBy("dateCreated", "desc"),
-    limit(10)
+    limit(docsLimit)
   );
   const gamesSnap = await getDocs(q);
 
@@ -40,15 +52,39 @@ export const getAllGamesByUserId = async (id: string) => {
   });
 };
 
-export const getTop20Games = async () => {
-  const gamesRef = collection(firebaseDb, "games");
-  const q = query(gamesRef, orderBy("points", "desc"), limit(10));
+export const getGamesWithPaginationByUserId = async (
+  id: string,
+  docsLimit: number,
+  key?: number
+) => {
+  // @ref https://stackoverflow.com/a/69036032/12278028
+  const constraints = [
+    where("user.id", "==", id), // @ref https://stackoverflow.com/a/62626994/12278028
+    orderBy("dateCreated", "desc"),
+  ];
 
+  if (key) {
+    constraints.push(startAfter(key));
+  } else {
+    constraints.push(limit(docsLimit));
+  }
+
+  const gamesRef = collection(firebaseDb, "games");
+  const q = query(gamesRef, ...constraints);
   const gamesSnap = await getDocs(q);
 
-  return gamesSnap.docs.map((game) => {
+  let lastKey;
+
+  const games = gamesSnap.docs.map((game) => {
+    lastKey = game.data().dateCreated;
+
     return game.data();
   });
+
+  return {
+    games,
+    lastKey,
+  };
 };
 
 export const createUser = async (

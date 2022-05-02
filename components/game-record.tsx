@@ -6,13 +6,13 @@ import { Game } from "../interfaces/game.interface";
 interface GameRecordProps {
   index: number;
   game: Game;
-  handleContentClick: (words: string[]) => void;
+  handleRecordClick: (words: string[]) => void;
   isLeaderboard: boolean;
 }
 
 const GameRecord = (props: GameRecordProps) => {
   const { authUser } = useAuth();
-  const { index, game, handleContentClick, isLeaderboard } = props;
+  const { index, game, handleRecordClick, isLeaderboard } = props;
   const { points, user, words, wpm } = game;
 
   return (
@@ -50,7 +50,7 @@ const GameRecord = (props: GameRecordProps) => {
           },
         };
       }}
-      onClick={() => handleContentClick(words)}
+      onClick={() => handleRecordClick(words)}
     >
       <Group grow>
         <Box>

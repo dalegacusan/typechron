@@ -1,42 +1,73 @@
 import React, { useEffect, useState } from "react";
-import { Box, Loader, Stack, Text, Title } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Center,
+  Group,
+  Loader,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
-import { getAllGamesByUserId } from "../utils/firebase-functions";
+import { getGamesWithPaginationByUserId } from "../utils/firebase-functions";
 import { Game } from "../interfaces/game.interface";
-import GameModal from "../components/modals/game-modal";
+import GameRecordModal from "../components/modals/game-record-modal";
 import GameRecord from "../components/game-record";
 import PageNotFound from "./404";
 
 const UserAccount = () => {
   const { authUser, loading } = useAuth();
   const [games, setGames] = useState<Game[]>();
+  const [isLoadingNextGames, setIsLoadingNextGames] = useState<boolean>(false);
+  const [gameLastKey, setGameLastKey] = useState<number | undefined>();
   const [isGameModalOpened, setIsGameModalOpened] = useState<boolean>(false);
-  const [gameToDisplay, setGameToDisplay] = useState<Game>();
+  const [gameToDisplayInModal, setGameToDisplayInModal] = useState<Game>();
 
-  const handleContentClick = (game: Game) => {
-    setGameToDisplay(game);
+  const handleRecordClick = (game: Game) => {
+    setGameToDisplayInModal(game);
     setIsGameModalOpened(true);
+  };
+
+  const getMoreGames = (lastKey: number | undefined) => {
+    if (!loading && authUser && lastKey) {
+      setIsLoadingNextGames(true);
+      const getUserGames = async () => {
+        return getGamesWithPaginationByUserId(authUser.uid, 10, gameLastKey);
+      };
+
+      getUserGames()
+        .then((data) => {
+          // @ts-ignore
+          setGames((prev) => [...prev, ...data.games]);
+          setGameLastKey(data.lastKey);
+          setIsLoadingNextGames(false);
+        })
+        .catch();
+    }
   };
 
   useEffect(() => {
     if (!loading && authUser) {
       const getUserGames = async () => {
-        return getAllGamesByUserId(authUser.uid);
+        return getGamesWithPaginationByUserId(authUser.uid, 10);
       };
 
       getUserGames()
         .then((data) => {
-          setGames(data);
+          // @ts-ignore
+          setGames(data.games);
+          setGameLastKey(data.lastKey);
         })
         .catch();
     }
   }, [loading]);
 
   return (
-    <div>
-      {gameToDisplay && (
-        <GameModal
-          game={gameToDisplay}
+    <Box mb={70}>
+      {gameToDisplayInModal && (
+        <GameRecordModal
+          game={gameToDisplayInModal}
           isGameModalOpened={isGameModalOpened}
           setIsGameModalOpened={setIsGameModalOpened}
         />
@@ -53,9 +84,16 @@ const UserAccount = () => {
       {!loading && authUser && (
         <Box>
           <Title order={2}>My Account</Title>
-          <Text size="sm" color="dimmed" mt={4}>
-            Hello, {authUser.username}
-          </Text>
+          <Group grow>
+            <Text size="sm" color="dimmed" mt={4}>
+              Hello, {authUser.username}
+            </Text>
+            {games && games.length !== 0 && (
+              <Text size="sm" align="right" color="dimmed">
+                Showing {games.length} record{games.length !== 1 && "s"}
+              </Text>
+            )}
+          </Group>
 
           <Box mt={30}>
             {games && games.length === 0 && (
@@ -71,18 +109,34 @@ const UserAccount = () => {
                         key={idx}
                         index={idx}
                         game={game}
-                        handleContentClick={() => handleContentClick(game)}
+                        handleRecordClick={() => handleRecordClick(game)}
                         isLeaderboard={false}
                       />
                     );
                   })}
                 </Stack>
+
+                <Center mt={30}>
+                  {gameLastKey ? (
+                    <Button
+                      onClick={() => getMoreGames(gameLastKey)}
+                      loading={isLoadingNextGames}
+                      size="xs"
+                      variant="subtle"
+                      color="gray"
+                    >
+                      Load more records
+                    </Button>
+                  ) : (
+                    <Text size="xs">You're up-to-date!</Text>
+                  )}
+                </Center>
               </>
             )}
           </Box>
         </Box>
       )}
-    </div>
+    </Box>
   );
 };
 

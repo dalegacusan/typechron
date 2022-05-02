@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { Box, Loader, Stack, Text, Title } from "@mantine/core";
 import { GetServerSidePropsContext } from "next";
 import { Game } from "../interfaces/game.interface";
-import { getTop20Games } from "../utils/firebase-functions";
-import GameModal from "../components/modals/game-modal";
+import { getGames } from "../utils/firebase-functions";
+import GameRecordModal from "../components/modals/game-record-modal";
 import GameRecord from "../components/game-record";
 
 interface LeaderboardsProps {
@@ -12,18 +12,18 @@ interface LeaderboardsProps {
 
 const Leaderboards = (props: LeaderboardsProps) => {
   const [isGameModalOpened, setIsGameModalOpened] = useState<boolean>(false);
-  const [gameToDisplay, setGameToDisplay] = useState<Game>();
+  const [gameToDisplayInModal, setGameToDisplayInModal] = useState<Game>();
 
-  const handleContentClick = (game: Game) => {
-    setGameToDisplay(game);
+  const handleRecordClick = (game: Game) => {
+    setGameToDisplayInModal(game);
     setIsGameModalOpened(true);
   };
 
   return (
     <Box mb={70}>
-      {gameToDisplay && (
-        <GameModal
-          game={gameToDisplay}
+      {gameToDisplayInModal && (
+        <GameRecordModal
+          game={gameToDisplayInModal}
           isGameModalOpened={isGameModalOpened}
           setIsGameModalOpened={setIsGameModalOpened}
         />
@@ -49,7 +49,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
                   key={idx}
                   index={idx}
                   game={game}
-                  handleContentClick={() => handleContentClick(game)}
+                  handleRecordClick={() => handleRecordClick(game)}
                   isLeaderboard={true}
                 />
               );
@@ -64,7 +64,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
 export default Leaderboards;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const games = await getTop20Games();
+  const games = await getGames(10);
 
   return {
     props: { games },

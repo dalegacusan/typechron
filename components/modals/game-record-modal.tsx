@@ -3,13 +3,13 @@ import { Game } from "../../interfaces/game.interface";
 import React from "react";
 import DoneWords from "../done-words";
 
-interface GameModalProps {
+interface GameRecordModalProps {
   game: Game;
   isGameModalOpened: boolean;
   setIsGameModalOpened: (isOpened: boolean) => void;
 }
 
-const GameModal = (props: GameModalProps) => {
+const GameRecordModal = (props: GameRecordModalProps) => {
   const { game, isGameModalOpened, setIsGameModalOpened } = props;
 
   let date = new Date(game.dateCreated as number);
@@ -44,4 +44,4 @@ const GameModal = (props: GameModalProps) => {
   );
 };
 
-export default GameModal;
+export default GameRecordModal;
