@@ -65,7 +65,7 @@ const UserAccount = () => {
         <Box>
           <Title order={2}>My Account</Title>
           <Text size="sm" color="dimmed" mt={4}>
-            Hello {authUser.username}
+            Hello, {authUser.username}
           </Text>
 
           <Box mt={30}>
