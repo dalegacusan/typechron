@@ -44,6 +44,18 @@ export default async function handler(
         )
       );
 
+      // Handle 2 similar "orderBy" to field "dateCreated"
+      // For My Account page, must use only "dateCreated" field path
+      // For Leaderboards page, must use both "score" and "dateCreated" field paths
+      if (reqBody.request.body.orderBy.fieldPath !== "dateCreated") {
+        constraints.push(
+          orderBy(
+            "dateCreated",
+            reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
+          )
+        );
+      }
+
       if (reqBody.request.body.lastKey) {
         constraints.push(startAfter(reqBody.request.body.lastKey));
       }
