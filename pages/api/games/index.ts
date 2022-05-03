@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../enums/api-request-function.enum";
-import { ApiResultCode } from "../../../enums/api-result-code.enum";
+import { ApiResultStatus } from "../../../enums/api-result-status.enum";
 import {
   APIGamesRequest,
   APIGamesResponse,
@@ -17,6 +17,7 @@ import { Game } from "../../../interfaces/game.interface";
 import { CreateGame, GetGames } from "../../../utils/firebase-functions";
 import { v4 as uuidv4 } from "uuid";
 import { CreateSignature } from "../../../utils/hash";
+import { ApiResultCode } from "../../../enums/api-result-code.enum";
 
 export default async function handler(
   req: NextApiRequest,
@@ -76,7 +77,9 @@ export default async function handler(
           },
           body: {
             resultInfo: {
-              resultCode: ApiResultCode.FAILURE,
+              resultStatus: ApiResultStatus.FAILURE,
+              resultCode: ApiResultCode.REQ_FUNC_NOT_SUPPORTED,
+              resultMsg: "Request function not supported.",
             },
           },
         },
@@ -91,7 +94,9 @@ export default async function handler(
         },
         body: {
           resultInfo: {
-            resultCode: ApiResultCode.SUCCESS,
+            resultStatus: ApiResultStatus.SUCCESS,
+            resultCode: ApiResultCode.REQ_SUCCESS,
+            resultMsg: ApiResultStatus.SUCCESS,
           },
           game,
           games,
@@ -108,7 +113,9 @@ export default async function handler(
         },
         body: {
           resultInfo: {
-            resultCode: ApiResultCode.FAILURE,
+            resultStatus: ApiResultStatus.FAILURE,
+            resultCode: ApiResultCode.REQ_HTTP_METHOD_NOT_SUPPORTED,
+            resultMsg: "HTTP request method not supported.",
           },
         },
       },
@@ -117,11 +124,16 @@ export default async function handler(
   }
 
   // Create signature
-  resBody.signature = CreateSignature(JSON.stringify(resBody)).toString(
+  const dataToSign = {
+    head: resBody.response.head,
+    body: resBody.response.body,
+  };
+
+  resBody.signature = CreateSignature(JSON.stringify(dataToSign)).toString(
     "base64"
   );
 
-  const resultCode = resBody.response.body.resultInfo.resultCode;
+  const resultCode = resBody.response.body.resultInfo.resultStatus;
 
-  res.status(resultCode === ApiResultCode.SUCCESS ? 200 : 400).json(resBody);
+  res.status(resultCode === ApiResultStatus.SUCCESS ? 200 : 400).json(resBody);
 }

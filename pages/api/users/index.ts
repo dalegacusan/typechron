@@ -1,7 +1,7 @@
 import { DocumentData, where } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../enums/api-request-function.enum";
-import { ApiResultCode } from "../../../enums/api-result-code.enum";
+import { ApiResultStatus } from "../../../enums/api-result-status.enum";
 import {
   APIUsersRequest,
   APIUsersResponse,
@@ -54,7 +54,8 @@ export default async function handler(
           },
           body: {
             resultInfo: {
-              resultCode: ApiResultCode.FAILURE,
+              resultStatus: ApiResultStatus.FAILURE,
+              resultMsg: "Request function not supported.",
             },
           },
         },
@@ -69,7 +70,8 @@ export default async function handler(
         },
         body: {
           resultInfo: {
-            resultCode: ApiResultCode.SUCCESS,
+            resultStatus: ApiResultStatus.SUCCESS,
+            resultMsg: ApiResultStatus.SUCCESS,
           },
           user,
         },
@@ -84,7 +86,8 @@ export default async function handler(
         },
         body: {
           resultInfo: {
-            resultCode: ApiResultCode.FAILURE,
+            resultStatus: ApiResultStatus.FAILURE,
+            resultMsg: "HTTP request method not supported.",
           },
         },
       },
@@ -93,11 +96,16 @@ export default async function handler(
   }
 
   // Create signature
-  resBody.signature = CreateSignature(JSON.stringify(resBody)).toString(
+  const dataToSign = {
+    head: resBody.response.head,
+    body: resBody.response.body,
+  };
+
+  resBody.signature = CreateSignature(JSON.stringify(dataToSign)).toString(
     "base64"
   );
 
-  const resultCode = resBody.response.body.resultInfo.resultCode;
+  const resultCode = resBody.response.body.resultInfo.resultStatus;
 
-  res.status(resultCode === ApiResultCode.SUCCESS ? 200 : 400).json(resBody);
+  res.status(resultCode === ApiResultStatus.SUCCESS ? 200 : 400).json(resBody);
 }
