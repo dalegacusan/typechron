@@ -74,7 +74,7 @@ const SignIn = () => {
           )}
 
           {isSignInError && (
-            <Text color={red} align="center">
+            <Text color={red} align="center" mt={12}>
               Failed to sign in.
             </Text>
           )}

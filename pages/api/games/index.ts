@@ -39,8 +39,8 @@ export default async function handler(
 
       constraints.push(
         orderBy(
-          "score",
-          reqBody.request.body.orderBy.toLowerCase() as OrderByDirection
+          reqBody.request.body.orderBy.fieldPath,
+          reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
         )
       );
 

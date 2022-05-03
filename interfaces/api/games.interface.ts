@@ -3,7 +3,7 @@ import { Game } from "../game.interface";
 import { DocumentData } from "firebase/firestore";
 import { ApiResultStatus } from "../../enums/api/api-result-status.enum";
 import { ApiResultCode } from "../../enums/api/api-result-code.enum";
-import { QueryOrderBy } from "../../enums/api/query-order-by.enum";
+import { QueryOrderDirection } from "../../enums/api/query-order-direction.enum";
 
 export interface APIGamesRequest {
   request: {
@@ -12,7 +12,10 @@ export interface APIGamesRequest {
     };
     body: {
       limit: number;
-      orderBy: QueryOrderBy;
+      orderBy: {
+        direction: QueryOrderDirection;
+        fieldPath: string;
+      };
       lastKey?: number;
       // For creating a new game record
       userId?: string;
@@ -23,7 +26,6 @@ export interface APIGamesRequest {
       dateCreated?: number;
     };
   };
-  signature: string;
 }
 
 export interface APIGamesResponse {

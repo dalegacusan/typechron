@@ -14,7 +14,6 @@ export interface APIUsersRequest {
       username?: string;
     };
   };
-  signature: string;
 }
 
 export interface APIUsersResponse {

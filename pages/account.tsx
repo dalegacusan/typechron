@@ -10,11 +10,12 @@ import {
   Title,
 } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
-import { getGamesWithPaginationByUserId } from "../utils/firebase-functions";
 import { Game } from "../interfaces/game.interface";
 import GameRecordModal from "../components/modals/game-record-modal";
 import GameRecord from "../components/game-record";
 import PageNotFound from "./404";
+import { QUERY_GAMES } from "../utils/http";
+import { QueryOrderDirection } from "../enums/api/query-order-direction.enum";
 
 const UserAccount = () => {
   const { authUser, loading } = useAuth();
@@ -32,15 +33,20 @@ const UserAccount = () => {
   const getMoreGames = (lastKey: number | undefined) => {
     if (!loading && authUser && lastKey) {
       setIsLoadingNextGames(true);
-      const getUserGames = async () => {
-        return getGamesWithPaginationByUserId(authUser.uid, 10, gameLastKey);
-      };
+
+      const getUserGames = async () =>
+        QUERY_GAMES(
+          10,
+          { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },
+          authUser.uid,
+          gameLastKey
+        );
 
       getUserGames()
-        .then((data) => {
+        .then(({ games, lastKey }) => {
           // @ts-ignore
-          setGames((prev) => [...prev, ...data.games]);
-          setGameLastKey(data.lastKey);
+          setGames((prev) => [...prev, ...games]);
+          setGameLastKey(lastKey);
           setIsLoadingNextGames(false);
         })
         .catch();
@@ -49,15 +55,18 @@ const UserAccount = () => {
 
   useEffect(() => {
     if (!loading && authUser) {
-      const getUserGames = async () => {
-        return getGamesWithPaginationByUserId(authUser.uid, 10);
-      };
+      const getUserGames = async () =>
+        QUERY_GAMES(
+          10,
+          { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },
+          authUser.uid
+        );
 
       getUserGames()
-        .then((data) => {
+        .then(({ games, lastKey }) => {
           // @ts-ignore
-          setGames(data.games);
-          setGameLastKey(data.lastKey);
+          setGames(games);
+          setGameLastKey(lastKey);
         })
         .catch();
     }
