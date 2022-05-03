@@ -6,10 +6,12 @@ import {
   Modal,
   Space,
   Text,
+  Title,
   Tooltip,
   useMantineTheme,
 } from "@mantine/core";
 import { BrandGithub, InfoCircle } from "tabler-icons-react";
+import Link from "next/link";
 
 interface HelpModalProps {
   isOpenModal: boolean;
@@ -31,31 +33,62 @@ const HelpModal = (props: HelpModalProps) => {
       }
       overlayOpacity={0.55}
       overlayBlur={3}
-      title="How to play"
+      title="Help"
       centered
     >
       <Divider my="sm" />
       <Space h="md" />
 
-      <Text>
+      <Title order={4}>How to play?</Title>
+      <Space h="sm" />
+
+      <Text size="sm">
         1. Type <Code>start</Code> in the text box to begin the game.
       </Text>
       <Space h="sm" />
 
-      <Text>
+      <Text size="sm">
         2. You have 10 seconds to play. Type out each word as fast as you can.
       </Text>
       <Space h="sm" />
 
-      <Text>3. For each word you get correctly, you get 1 extra second.</Text>
+      <Text size="sm">
+        3. For each word you get correctly, you get 1 extra second.
+      </Text>
       <Space h="md" />
 
       <Alert icon={<InfoCircle size={16} />} title="Bonus!" color="blue">
         There is a small chance that you get an extra 2 seconds instead of 1 😉
       </Alert>
       <Space h="md" />
+      <Space h="md" />
 
-      <Text>Goodluck!</Text>
+      <Title order={4}>How do I join the leaderboards?</Title>
+      <Space h="sm" />
+
+      <Text size="sm">
+        You can join the leaderboards when you are{" "}
+        <Link href="/login">
+          <Text
+            variant="link"
+            component="a"
+            size="sm"
+            style={{ cursor: "pointer" }}
+          >
+            signed in
+          </Text>
+        </Link>
+        . Otherwise, you are playing as a guest.
+      </Text>
+
+      <Space h="md" />
+      <Space h="sm" />
+
+      <Title order={4}>Can I change my username?</Title>
+      <Space h="sm" />
+
+      <Text size="sm">No, for now.</Text>
+
       <Space h="sm" />
 
       <Text align="right">

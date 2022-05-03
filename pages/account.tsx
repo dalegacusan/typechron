@@ -20,7 +20,7 @@ import PageNotFound from "./404";
 const UserAccount = () => {
   const { authUser, loading } = useAuth();
   const [games, setGames] = useState<Game[]>();
-  const [userHighscore, setUserHighScore] = useState();
+  const [userHighscore, setUserHighScore] = useState<Game>();
   const [isLoadingNextGames, setIsLoadingNextGames] = useState<boolean>(false);
   const [gameLastKey, setGameLastKey] = useState<number | undefined>();
   const [isGameModalOpened, setIsGameModalOpened] = useState<boolean>(false);
@@ -111,52 +111,57 @@ const UserAccount = () => {
           </Group>
 
           <Box mt={30}>
+            {!games && <Loader size="sm" />}
+
             {games && games.length === 0 && (
               <Text color="dimmed">No available data</Text>
             )}
 
             {games && games.length !== 0 && (
               <>
-                <Box>
-                  <Title order={5}>High Score</Title>
-                  <Box
-                    sx={(theme) => {
-                      return {
-                        backgroundColor: theme.colors.lime[4],
-                        color: theme.colors.dark[9],
-                        padding: theme.spacing.xs,
-                        paddingLeft: theme.spacing.lg,
-                        paddingRight: theme.spacing.lg,
-                        cursor: "pointer",
+                {userHighscore && userHighscore.score !== 0 && (
+                  <Box>
+                    <Title order={5}>High Score</Title>
+                    <Box
+                      sx={(theme) => {
+                        return {
+                          backgroundColor: theme.colors.lime[4],
+                          color: theme.colors.dark[9],
+                          padding: theme.spacing.xs,
+                          paddingLeft: theme.spacing.lg,
+                          paddingRight: theme.spacing.lg,
+                          cursor: "pointer",
 
-                        "&:hover": {
-                          backgroundColor: theme.colors.lime[5],
-                        },
-                      };
-                    }}
-                    onClick={() => handleRecordClick(userHighscore)}
-                    mt={10}
-                    mb={35}
-                  >
-                    <Group grow>
-                      <Box>
-                        <Text size="sm">
-                          {authUser && `${authUser.username}`}
-                        </Text>
-                      </Box>
-                      <Box>
-                        <Group grow>
-                          <Text size="sm" align="right">
-                            {userHighscore?.wpm} wpm
+                          "&:hover": {
+                            backgroundColor: theme.colors.lime[5],
+                          },
+                        };
+                      }}
+                      onClick={() => handleRecordClick(userHighscore)}
+                      mt={10}
+                      mb={35}
+                    >
+                      <Group grow>
+                        <Box>
+                          <Text size="sm">
+                            {authUser && `${authUser.username}`}
                           </Text>
-                          <Text size="sm" align="right">
-                            {userHighscore?.score} points
-                          </Text>
-                        </Group>
-                      </Box>
-                    </Group>
+                        </Box>
+                        <Box>
+                          <Group grow>
+                            <Text size="sm" align="right">
+                              {userHighscore?.wpm} wpm
+                            </Text>
+                            <Text size="sm" align="right">
+                              {userHighscore?.score} points
+                            </Text>
+                          </Group>
+                        </Box>
+                      </Group>
+                    </Box>
                   </Box>
-                </Box>
+                )}
+
                 <Stack>
                   {games.map((game: Game, idx: number) => {
                     return (
@@ -183,7 +188,7 @@ const UserAccount = () => {
                       Load more records
                     </Button>
                   ) : (
-                    <Text size="xs">You're up-to-date!</Text>
+                    <Text size="xs">You&apos;re up-to-date!</Text>
                   )}
                 </Center>
               </>

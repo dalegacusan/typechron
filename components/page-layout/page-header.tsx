@@ -72,14 +72,17 @@ export function PageHeader() {
         </Link>
 
         <Group spacing={5}>
-          <a className={classes.link} onClick={() => setIsOpenModal(true)}>
-            Help
+          <a className={classes.link} onClick={() => router.push("/")}>
+            Home
           </a>
           <a
             className={classes.link}
             onClick={() => router.push("/leaderboards")}
           >
             Leaderboards
+          </a>
+          <a className={classes.link} onClick={() => setIsOpenModal(true)}>
+            Help
           </a>
 
           {loading && !authUser && <Loader size="sm" />}

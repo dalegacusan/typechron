@@ -39,7 +39,7 @@ export interface APIGamesResponse {
         resultCode: ApiResultCode;
         resultMsg: string;
       };
-      game?: Game;
+      game?: DocumentData; // Type Game
       games?: DocumentData[]; // Type Game
       lastKey?: number;
     };
