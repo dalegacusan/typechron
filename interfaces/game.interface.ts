@@ -1,14 +1,10 @@
 export interface Game {
   id?: string;
-  user: {
-    id: string;
-    username: string;
-  };
+  userId: string;
   round: number;
-  points: number;
+  score: number;
   wpm: number;
   words: string[];
   // Store as unix timestamp
-  // Optional because server should be the one creating timestamp
-  dateCreated?: number;
+  dateCreated: number;
 }

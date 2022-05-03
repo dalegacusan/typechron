@@ -3,17 +3,13 @@ import {
   collection,
   DocumentData,
   getDocs,
-  limit,
-  orderBy,
   query,
-  startAfter,
   where,
 } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { GenerateUsername } from "./words";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
-import { v4 as uuidv4 } from "uuid";
 
 export const getOneUserById = async (
   id: string
@@ -58,51 +54,15 @@ export const createUser = async (
   };
 };
 
-export const getGames = async (
-  docsLimit: number
-): Promise<{
-  games: DocumentData[];
-}> => {
-  const gamesRef = collection(firebaseDb, "games");
-  const q = query(gamesRef, orderBy("points", "desc"), limit(docsLimit));
-
-  const gamesSnap = await getDocs(q);
-
-  const games = gamesSnap.docs.map((game) => game.data());
-
-  return {
-    games,
-  };
-};
-
-// @ref https://dev.to/hadi/infinite-scroll-in-firebase-firestore-and-react-js-55g3
-export const getGamesWithPaginationByUserId = async (
-  id: string,
-  docsLimit: number,
-  key?: number
-): Promise<{
-  games: DocumentData[];
-  lastKey: number | undefined;
-}> => {
-  // @ref https://stackoverflow.com/a/69036032/12278028
-  const constraints = [
-    where("user.id", "==", id), // @ref https://stackoverflow.com/a/62626994/12278028
-    orderBy("dateCreated", "desc"),
-  ];
-
-  if (key) {
-    constraints.push(startAfter(key));
-  } else {
-    constraints.push(limit(docsLimit));
-  }
-
+export const GetGames = async (constraints: Array<any>) => {
   const gamesRef = collection(firebaseDb, "games");
   const q = query(gamesRef, ...constraints);
   const gamesSnap = await getDocs(q);
 
-  // If there are no more docs, this will be undefined
-  // If this is undefined, it'll tell the frontend that
-  // there are no more available records
+  // If there are no more docs, "lastKey" will be undefined.
+  // If this is undefined, it's an indicator to the frontend that
+  // there are no more available records.
+  // @ref https://dev.to/hadi/infinite-scroll-in-firebase-firestore-and-react-js-55g3
   let lastKey;
   const games = gamesSnap.docs.map((game) => {
     lastKey = game.data().dateCreated;
@@ -116,20 +76,10 @@ export const getGamesWithPaginationByUserId = async (
   };
 };
 
-export const createGame = async (game: Game): Promise<{ game: Game }> => {
-  const newGame: Game = {
-    id: uuidv4(),
-    user: game.user,
-    round: game.round,
-    points: game.points,
-    wpm: game.wpm,
-    words: game.words,
-    dateCreated: Date.now(),
-  };
-
-  await addDoc(collection(firebaseDb, "games"), newGame);
+export const CreateGame = async (game: Game): Promise<{ game: Game }> => {
+  await addDoc(collection(firebaseDb, "games"), game);
 
   return {
-    game: newGame,
+    game,
   };
 };

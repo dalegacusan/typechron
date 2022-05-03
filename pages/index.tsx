@@ -5,7 +5,7 @@ import { CurrentTimeInMs } from "../utils/time";
 import { black, initialGameTimeInMs } from "../config";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
-import { createGame } from "../utils/firebase-functions";
+import { CreateGame } from "../utils/firebase-functions";
 import { Game } from "../interfaces/game.interface";
 import { Check, Plus } from "tabler-icons-react";
 import { showNotification } from "@mantine/notifications";
@@ -103,16 +103,11 @@ const Home: NextPage = () => {
   };
 
   const handleSaveRecord = async () => {
-    const { game: newGameRecord } = await createGame({
+    const { game: newGameRecord } = await CreateGame({
       // because user can only save a record if he is logged in
-      user: {
-        // @ts-ignore
-        id: authUser.uid,
-        // @ts-ignore
-        username: authUser.username,
-      },
+      userId: authUser.uid as string,
       round: doneWords.length - 1,
-      points: userScore,
+      score: userScore,
       wpm: Number(wpm),
       words: doneWords,
     });
