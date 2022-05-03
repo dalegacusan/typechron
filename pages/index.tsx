@@ -32,6 +32,7 @@ const Home: NextPage = () => {
     useState<ReturnType<typeof setInterval>>(); // @ref https://stackoverflow.com/a/59681620/12278028
   const [isInGame, setIsInGame] = useState(false);
   const [isGameEnded, setIsGameEnded] = useState(false);
+  const [isSavingRecord, setIsSavingRecord] = useState(false);
   const [isRecordSaved, setIsRecordSaved] = useState(false);
 
   const handleAdditionalGameTime = () => {
@@ -104,6 +105,8 @@ const Home: NextPage = () => {
   };
 
   const handleSaveRecord = async () => {
+    setIsSavingRecord(true);
+
     const { game: newGameRecord } = await CREATE_GAME(
       authUser?.uid as string,
       doneWords.length - 1,
@@ -124,6 +127,8 @@ const Home: NextPage = () => {
         icon: <Check />,
       });
     }
+
+    setIsSavingRecord(false);
   };
 
   useEffect(() => {
@@ -217,6 +222,7 @@ const Home: NextPage = () => {
               color="gray"
               onClick={handleSaveRecord}
               leftIcon={<Plus size={12} />}
+              loading={isSavingRecord}
             >
               Save record
             </Button>

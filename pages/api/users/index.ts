@@ -1,4 +1,4 @@
-import { DocumentData, where } from "firebase/firestore";
+import { DocumentData } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../enums/api/api-request-function.enum";
 import { ApiResultCode } from "../../../enums/api/api-result-code.enum";
@@ -27,12 +27,7 @@ export default async function handler(
 
       // @ts-ignore
       if (query.user) {
-        const {
-          email,
-          dateCreated: tempDateCreated,
-          highestScoringGame,
-          ...userData
-        } = query.user;
+        const { email, dateCreated: tempDateCreated, ...userData } = query.user;
 
         user = userData;
       } else {
@@ -63,12 +58,7 @@ export default async function handler(
 
       const query = await CreateUser(newUser);
 
-      const {
-        email,
-        dateCreated: tempDateCreated,
-        highestScoringGame,
-        ...userData
-      } = query.user;
+      const { email, dateCreated: tempDateCreated, ...userData } = query.user;
 
       user = userData;
     } else {
