@@ -1,26 +1,17 @@
-import {
-  addDoc,
-  collection,
-  DocumentData,
-  getDocs,
-  query,
-  where,
-} from "firebase/firestore";
+import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { GenerateUsername } from "./words";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
 
-export const getOneUserById = async (
-  id: string
-): Promise<{ user: DocumentData | null }> => {
+export const GetUser = async (constraints: Array<any>) => {
   const usersRef = collection(firebaseDb, "users");
-  const q = query(usersRef, where("id", "==", id));
+  const q = query(usersRef, ...constraints);
   const userSnap = await getDocs(q);
 
   if (userSnap.docs.length !== 1) {
     return {
-      user: null,
+      user: undefined,
     };
   }
 

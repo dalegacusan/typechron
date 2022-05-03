@@ -69,6 +69,19 @@ export default async function handler(
 
       game = query.game;
     } else {
+      resBody = {
+        response: {
+          head: {
+            function: reqFunction,
+          },
+          body: {
+            resultInfo: {
+              resultCode: ApiResultCode.FAILURE,
+            },
+          },
+        },
+        signature: "",
+      };
     }
 
     resBody = {
@@ -108,9 +121,7 @@ export default async function handler(
     "base64"
   );
 
-  if (resBody.response.body.resultInfo.resultCode === ApiResultCode.SUCCESS) {
-    res.status(200).json(resBody);
-  } else {
-    res.status(400).json(resBody);
-  }
+  const resultCode = resBody.response.body.resultInfo.resultCode;
+
+  res.status(resultCode === ApiResultCode.SUCCESS ? 200 : 400).json(resBody);
 }
