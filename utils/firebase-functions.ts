@@ -17,16 +17,20 @@ export const GetUser = async (constraints: Array<any>) => {
     };
   }
 
+  const { email, dateCreated, ...userData } = userSnap.docs[0].data();
+
   return {
-    user: userSnap.docs[0].data(),
+    user: userData,
   };
 };
 
-export const CreateUser = async (user: User): Promise<{ user: User }> => {
+export const CreateUser = async (user: User) => {
   await addDoc(collection(firebaseDb, "users"), user);
 
+  const { email, dateCreated, ...userData } = user;
+
   return {
-    user,
+    user: userData,
   };
 };
 
@@ -45,6 +49,7 @@ export const GetGames = async (constraints: Array<any>) => {
   let lastKey;
   const games: any = [];
 
+  // @ref https://stackoverflow.com/a/37576787/12278028
   for (const game of gamesSnap.docs) {
     lastKey = game.data().dateCreated;
 
