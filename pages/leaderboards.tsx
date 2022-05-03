@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Box, Loader, Stack, Text, Title } from "@mantine/core";
 import { GetServerSidePropsContext } from "next";
 import { Game } from "../interfaces/game.interface";
-import { getGames } from "../utils/firebase-functions";
+import { QUERY_GAMES } from "../utils/http";
+import { QueryOrderDirection } from "../enums/api/query-order-direction.enum";
 import GameRecordModal from "../components/modals/game-record-modal";
 import GameRecord from "../components/game-record";
 
@@ -64,7 +65,10 @@ const Leaderboards = (props: LeaderboardsProps) => {
 export default Leaderboards;
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const { games } = await getGames(10);
+  const { games } = await QUERY_GAMES(10, {
+    direction: QueryOrderDirection.DESC,
+    fieldPath: "score",
+  });
 
   return {
     props: { games },

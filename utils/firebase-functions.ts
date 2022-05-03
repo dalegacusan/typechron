@@ -1,4 +1,4 @@
-import { addDoc, collection, getDocs, query } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
@@ -43,11 +43,23 @@ export const GetGames = async (constraints: Array<any>) => {
   // there are no more available records.
   // @ref https://dev.to/hadi/infinite-scroll-in-firebase-firestore-and-react-js-55g3
   let lastKey;
-  const games = gamesSnap.docs.map((game) => {
+  const games: any = [];
+
+  for (const game of gamesSnap.docs) {
     lastKey = game.data().dateCreated;
 
-    return game.data();
-  });
+    const { user } = await GetUser([where("id", "==", game.data().userId)]);
+
+    // Filter user data
+    const { userId, ...gameData } = game.data();
+    //@ts-ignore
+    const { email, dateCreated, ...userData } = user;
+
+    games.push({
+      ...gameData,
+      user: userData,
+    });
+  }
 
   return {
     games,

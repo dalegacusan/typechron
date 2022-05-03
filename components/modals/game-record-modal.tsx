@@ -12,10 +12,10 @@ interface GameRecordModalProps {
 const GameRecordModal = (props: GameRecordModalProps) => {
   const { game, isGameModalOpened, setIsGameModalOpened } = props;
 
-  let date = new Date(game.dateCreated as number);
-  let year = date.getFullYear(); // 2020
-  let month = (date.getMonth() + 1).toString().padStart(2, "0"); // "04"
-  let day = date.getDate().toString().padStart(2, "0"); // "09"
+  const date = new Date(game.dateCreated as number);
+  const year = date.getFullYear(); // 2020
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // "04"
+  const day = date.getDate().toString().padStart(2, "0"); // "09"
 
   return (
     <Modal

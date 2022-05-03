@@ -13,7 +13,7 @@ interface GameRecordProps {
 const GameRecord = (props: GameRecordProps) => {
   const { authUser } = useAuth();
   const { index, game, handleRecordClick, isLeaderboard } = props;
-  const { points, user, words, wpm } = game;
+  const { score, user, words, wpm } = game;
 
   return (
     <Box
@@ -57,11 +57,11 @@ const GameRecord = (props: GameRecordProps) => {
           <Text size="sm">
             {isLeaderboard && `${index + 1}. `}
 
-            {authUser && authUser.uid === user.id
+            {authUser && authUser.uid === user?.id
               ? `${authUser.username}`
-              : user.username}
+              : user?.username}
 
-            {authUser && authUser.uid === user.id && isLeaderboard && ` (you)`}
+            {authUser && authUser.uid === user?.id && isLeaderboard && ` (you)`}
           </Text>
         </Box>
         <Box>
@@ -70,7 +70,7 @@ const GameRecord = (props: GameRecordProps) => {
               {wpm} wpm
             </Text>
             <Text size="sm" align="right">
-              {points} points
+              {score} points
             </Text>
           </Group>
         </Box>
