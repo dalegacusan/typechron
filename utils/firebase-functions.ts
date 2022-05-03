@@ -1,8 +1,10 @@
 import { addDoc, collection, getDocs, query } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
-import { GenerateUsername } from "./words";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
+
+// Users
+// ================
 
 export const GetUser = async (constraints: Array<any>) => {
   const usersRef = collection(firebaseDb, "users");
@@ -20,30 +22,16 @@ export const GetUser = async (constraints: Array<any>) => {
   };
 };
 
-export const createUser = async (
-  id: string,
-  email: string,
-  username?: string
-): Promise<{ user: User }> => {
-  const defaultUsername = GenerateUsername();
-
-  const newUser: User = {
-    id,
-    email,
-    username: defaultUsername,
-    dateCreated: new Date(),
-  };
-
-  if (username) {
-    newUser.username = username;
-  }
-
-  await addDoc(collection(firebaseDb, "users"), newUser);
+export const CreateUser = async (user: User): Promise<{ user: User }> => {
+  await addDoc(collection(firebaseDb, "users"), user);
 
   return {
-    user: newUser,
+    user,
   };
 };
+
+// Games
+// ================
 
 export const GetGames = async (constraints: Array<any>) => {
   const gamesRef = collection(firebaseDb, "games");

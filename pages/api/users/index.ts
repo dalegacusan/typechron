@@ -7,8 +7,9 @@ import {
   APIUsersResponse,
 } from "../../../interfaces/api/users.interface";
 import { User } from "../../../interfaces/user.interface";
-import { GetUser } from "../../../utils/firebase-functions";
+import { CreateUser, GetUser } from "../../../utils/firebase-functions";
 import { CreateSignature } from "../../../utils/hash";
+import { GenerateUsername } from "../../../utils/words";
 
 export default async function handler(
   req: NextApiRequest,
@@ -29,6 +30,22 @@ export default async function handler(
 
       user = query.user;
     } else if (reqFunction === ApiRequestFunction.USER_CREATE) {
+      const defaultUsername = GenerateUsername();
+
+      const newUser: User = {
+        id: reqBody.request.body.userId as string,
+        email: reqBody.request.body.email as string,
+        username: defaultUsername,
+        dateCreated: Date.now(),
+      };
+
+      if (reqBody.request.body.username) {
+        newUser.username = reqBody.request.body.username;
+      }
+
+      const query = await CreateUser(newUser);
+
+      user = query.user;
     } else {
       resBody = {
         response: {
