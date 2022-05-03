@@ -1,6 +1,7 @@
 import { DocumentData, where } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../enums/api-request-function.enum";
+import { ApiResultCode } from "../../../enums/api-result-code.enum";
 import { ApiResultStatus } from "../../../enums/api-result-status.enum";
 import {
   APIUsersRequest,
@@ -55,6 +56,7 @@ export default async function handler(
           body: {
             resultInfo: {
               resultStatus: ApiResultStatus.FAILURE,
+              resultCode: ApiResultCode.REQ_FUNC_NOT_SUPPORTED,
               resultMsg: "Request function not supported.",
             },
           },
@@ -71,6 +73,7 @@ export default async function handler(
         body: {
           resultInfo: {
             resultStatus: ApiResultStatus.SUCCESS,
+            resultCode: ApiResultCode.REQ_SUCCESS,
             resultMsg: ApiResultStatus.SUCCESS,
           },
           user,
@@ -87,6 +90,7 @@ export default async function handler(
         body: {
           resultInfo: {
             resultStatus: ApiResultStatus.FAILURE,
+            resultCode: ApiResultCode.REQ_HTTP_METHOD_NOT_SUPPORTED,
             resultMsg: "HTTP request method not supported.",
           },
         },
