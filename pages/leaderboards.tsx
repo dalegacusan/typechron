@@ -47,7 +47,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
             {props.games.map((game: Game, idx: number) => {
               return (
                 <GameRecord
-                  key={idx}
+                  key={game.id}
                   index={idx}
                   game={game}
                   handleRecordClick={() => handleRecordClick(game)}

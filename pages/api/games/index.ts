@@ -13,8 +13,12 @@ import {
   APIGamesResponse,
 } from "../../../interfaces/api/games.interface";
 import { Game } from "../../../interfaces/game.interface";
-import { CreateGame, GetGames } from "../../../utils/firebase-functions";
-import { v4 as uuidv4 } from "uuid";
+import {
+  CreateGame,
+  GetGames,
+  GetUser,
+  UpdateUser,
+} from "../../../utils/firebase-functions";
 import { ApiResultStatus } from "../../../enums/api/api-result-status.enum";
 import { ApiResultCode } from "../../../enums/api/api-result-code.enum";
 
@@ -28,7 +32,7 @@ export default async function handler(
   let resBody: APIGamesResponse = {} as APIGamesResponse;
 
   if (req.method === "POST") {
-    let game: Game | undefined,
+    let game: DocumentData | undefined,
       games: DocumentData[] | undefined,
       lastKey: number | undefined;
 
@@ -68,7 +72,6 @@ export default async function handler(
       lastKey = query.lastKey;
     } else if (reqFunction === ApiRequestFunction.GAME_CREATE) {
       const newGame: Game = {
-        id: uuidv4(),
         userId: reqBody.request.body.userId as string,
         round: reqBody.request.body.round as number,
         score: reqBody.request.body.score as number,
@@ -77,9 +80,25 @@ export default async function handler(
         dateCreated: Date.now(),
       };
 
-      const query = await CreateGame(newGame);
+      const gameQuery = await CreateGame(newGame);
 
-      game = query.game;
+      // Update high score
+      const { user } = await GetUser(newGame.userId);
+
+      if (user && newGame.score > user.highestScoringGame.score) {
+        const { userId, ...filteredNewGameData } = newGame;
+
+        const dataTobeUpdated = {
+          highestScoringGame: {
+            gameId: gameQuery.game.id,
+            ...filteredNewGameData,
+          },
+        };
+
+        await UpdateUser(newGame.userId, dataTobeUpdated);
+      }
+
+      game = gameQuery.game;
     } else {
       resBody = {
         response: {

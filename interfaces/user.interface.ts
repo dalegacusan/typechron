@@ -3,4 +3,12 @@ export interface User {
   email: string;
   username?: string;
   dateCreated: number;
+  highestScoringGame: {
+    gameId: string;
+    round: number;
+    score: number;
+    wpm: number;
+    words: string[];
+    dateCreated: number;
+  };
 }

@@ -1,4 +1,13 @@
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
@@ -6,32 +15,33 @@ import { User } from "../interfaces/user.interface";
 // Users
 // ================
 
-export const GetUser = async (constraints: Array<any>) => {
-  const usersRef = collection(firebaseDb, "users");
-  const q = query(usersRef, ...constraints);
-  const userSnap = await getDocs(q);
+export const GetUser = async (userId: string) => {
+  const userRef = doc(firebaseDb, "users", userId);
+  const userSnap = await getDoc(userRef);
 
-  if (userSnap.docs.length !== 1) {
+  if (!userSnap.exists()) {
     return {
       user: undefined,
     };
   }
 
-  const { email, dateCreated, ...userData } = userSnap.docs[0].data();
-
   return {
-    user: userData,
+    user: userSnap.data(),
   };
 };
 
 export const CreateUser = async (user: User) => {
-  await addDoc(collection(firebaseDb, "users"), user);
-
-  const { email, dateCreated, ...userData } = user;
+  await setDoc(doc(firebaseDb, "users", user.id), user);
 
   return {
-    user: userData,
+    user,
   };
+};
+
+export const UpdateUser = async (userId: string, dataToBeUpdated: any) => {
+  const usersRef = doc(firebaseDb, "users", userId);
+
+  await updateDoc(usersRef, dataToBeUpdated);
 };
 
 // Games
@@ -53,15 +63,16 @@ export const GetGames = async (constraints: Array<any>) => {
   for (const game of gamesSnap.docs) {
     lastKey = game.data().dateCreated;
 
-    const { user } = await GetUser([where("id", "==", game.data().userId)]);
+    const { user } = await GetUser(game.data().userId);
 
     // Filter user data
     const { userId, ...gameData } = game.data();
     //@ts-ignore
-    const { email, dateCreated, ...userData } = user;
+    const { email, dateCreated, highestScoringGame, ...userData } = user;
 
     games.push({
       ...gameData,
+      id: game.id,
       user: userData,
     });
   }
@@ -72,10 +83,13 @@ export const GetGames = async (constraints: Array<any>) => {
   };
 };
 
-export const CreateGame = async (game: Game): Promise<{ game: Game }> => {
-  await addDoc(collection(firebaseDb, "games"), game);
+export const CreateGame = async (game: Game) => {
+  const newGame = await addDoc(collection(firebaseDb, "games"), game);
 
   return {
-    game,
+    game: {
+      id: newGame.id,
+      ...game,
+    },
   };
 };

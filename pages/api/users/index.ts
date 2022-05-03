@@ -15,7 +15,6 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const constraints = []; // @ref https://stackoverflow.com/a/69036032/12278028
   const reqBody: APIUsersRequest = req.body;
   const reqFunction: ApiRequestFunction = reqBody.request.head.function;
   let resBody: APIUsersResponse = {} as APIUsersResponse;
@@ -24,19 +23,38 @@ export default async function handler(
     let user: DocumentData | undefined;
 
     if (reqFunction === ApiRequestFunction.USER_QUERY) {
-      constraints.push(where("id", "==", reqBody.request.body.userId));
+      const query = await GetUser(reqBody.request.body.userId as string);
 
-      const query = await GetUser(constraints);
+      // @ts-ignore
+      if (query.user) {
+        const {
+          email,
+          dateCreated: tempDateCreated,
+          highestScoringGame,
+          ...userData
+        } = query.user;
 
-      user = query.user;
+        user = userData;
+      } else {
+        user = query.user;
+      }
     } else if (reqFunction === ApiRequestFunction.USER_CREATE) {
       const defaultUsername = GenerateUsername();
+      const dateCreated = Date.now();
 
       const newUser: User = {
         id: reqBody.request.body.userId as string,
         email: reqBody.request.body.email as string,
         username: defaultUsername,
-        dateCreated: Date.now(),
+        dateCreated,
+        highestScoringGame: {
+          gameId: "",
+          round: 0,
+          score: 0,
+          wpm: 0,
+          words: [],
+          dateCreated,
+        },
       };
 
       if (reqBody.request.body.username) {
@@ -45,7 +63,14 @@ export default async function handler(
 
       const query = await CreateUser(newUser);
 
-      user = query.user;
+      const {
+        email,
+        dateCreated: tempDateCreated,
+        highestScoringGame,
+        ...userData
+      } = query.user;
+
+      user = userData;
     } else {
       resBody = {
         response: {
