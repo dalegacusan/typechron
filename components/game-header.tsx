@@ -1,6 +1,6 @@
 import React from "react";
 import Countdown from "react-countdown";
-import { initialGameTimeInMs } from "../config";
+import { initialGameTimeInMs } from "../config/app";
 import { Grid, Text } from "@mantine/core";
 import GameTime from "./game-time";
 

@@ -7,8 +7,7 @@ import {
   where,
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ApiRequestFunction } from "../../../enums/api-request-function.enum";
-import { ApiResultStatus } from "../../../enums/api-result-status.enum";
+import { ApiRequestFunction } from "../../../enums/api/api-request-function.enum";
 import {
   APIGamesRequest,
   APIGamesResponse,
@@ -16,8 +15,8 @@ import {
 import { Game } from "../../../interfaces/game.interface";
 import { CreateGame, GetGames } from "../../../utils/firebase-functions";
 import { v4 as uuidv4 } from "uuid";
-import { CreateSignature } from "../../../utils/hash";
-import { ApiResultCode } from "../../../enums/api-result-code.enum";
+import { ApiResultStatus } from "../../../enums/api/api-result-status.enum";
+import { ApiResultCode } from "../../../enums/api/api-result-code.enum";
 
 export default async function handler(
   req: NextApiRequest,
@@ -83,7 +82,6 @@ export default async function handler(
             },
           },
         },
-        signature: "",
       };
     }
 
@@ -103,7 +101,6 @@ export default async function handler(
           lastKey,
         },
       },
-      signature: "",
     };
   } else {
     resBody = {
@@ -119,19 +116,8 @@ export default async function handler(
           },
         },
       },
-      signature: "",
     };
   }
-
-  // Create signature
-  const dataToSign = {
-    head: resBody.response.head,
-    body: resBody.response.body,
-  };
-
-  resBody.signature = CreateSignature(JSON.stringify(dataToSign)).toString(
-    "base64"
-  );
 
   const resultCode = resBody.response.body.resultInfo.resultStatus;
 

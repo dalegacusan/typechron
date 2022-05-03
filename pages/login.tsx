@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAuth } from "../ contexts/authUserContext";
 import { Box, Center, Loader, Paper, Text, Title } from "@mantine/core";
-import { red } from "../config";
+import { red } from "../config/app";
 import GoogleLoginButton from "../components/social-login-buttons/google-login-btn";
 import Link from "next/link";
 

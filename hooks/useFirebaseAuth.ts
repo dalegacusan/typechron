@@ -6,7 +6,8 @@ import {
   User,
 } from "firebase/auth";
 import { firebaseAuth } from "../config/firebase-app";
-import { createUser, getOneUserById } from "../utils/firebase-functions";
+import { CREATE_USER, QUERY_USER } from "../utils/http";
+import { ApiResultCode } from "../enums/api/api-result-code.enum";
 
 export interface FormattedUser {
   uid: string;
@@ -36,23 +37,36 @@ export default function useFirebaseAuth() {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-
     const res = await signInWithPopup(firebaseAuth, provider);
     const loggedInUser = res.user;
 
     if (loggedInUser) {
-      const { user } = await getOneUserById(loggedInUser.uid);
+      const { user, resultInfo: qResultInfo } = await QUERY_USER(
+        loggedInUser.uid
+      );
+
+      if (qResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
+        signOut();
+
+        return { code: qResultInfo.resultCode };
+      }
 
       if (!user) {
-        const { user: newUser } = await createUser(
+        const { user: newUser, resultInfo: cResultInfo } = await CREATE_USER(
           loggedInUser.uid,
           loggedInUser.email as string
         );
 
+        if (cResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
+          signOut();
+
+          return { code: qResultInfo.resultCode };
+        }
+
         // @ts-ignore
         setAuthUser((prev) => ({
           ...prev,
-          username: newUser.username as string,
+          username: newUser?.username as string,
         }));
       }
     }
@@ -72,7 +86,17 @@ export default function useFirebaseAuth() {
     setLoading(true);
 
     const formattedUser = formatAuthUser(authState);
-    const { user } = await getOneUserById(formattedUser.uid); // Retrieve user to get username
+
+    // Query user to get username
+    const { user, resultInfo: qResultInfo } = await QUERY_USER(
+      formattedUser.uid
+    );
+
+    if (qResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
+      resetState();
+
+      return;
+    }
 
     setAuthUser((prev) => ({
       ...formattedUser,

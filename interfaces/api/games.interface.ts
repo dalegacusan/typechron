@@ -1,9 +1,9 @@
-import { ApiRequestFunction } from "../../enums/api-request-function.enum";
-import { QueryOrderBy } from "../../enums/query-order-by.enum";
+import { ApiRequestFunction } from "../../enums/api/api-request-function.enum";
 import { Game } from "../game.interface";
 import { DocumentData } from "firebase/firestore";
-import { ApiResultStatus } from "../../enums/api-result-status.enum";
-import { ApiResultCode } from "../../enums/api-result-code.enum";
+import { ApiResultStatus } from "../../enums/api/api-result-status.enum";
+import { ApiResultCode } from "../../enums/api/api-result-code.enum";
+import { QueryOrderBy } from "../../enums/api/query-order-by.enum";
 
 export interface APIGamesRequest {
   request: {
@@ -42,5 +42,4 @@ export interface APIGamesResponse {
       lastKey?: number;
     };
   };
-  signature: string;
 }

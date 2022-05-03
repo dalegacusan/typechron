@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Grid, Group, Paper, Text } from "@mantine/core";
 import { Check } from "tabler-icons-react";
-import { black } from "../config";
+import { black } from "../config/app";
 import Wpm from "./wpm";
 
 interface GameStatsProps {

@@ -2,7 +2,7 @@ import type { NextPage } from "next";
 import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTimeInMs } from "../utils/time";
-import { black, initialGameTimeInMs } from "../config";
+import { black, initialGameTimeInMs } from "../config/app";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { CreateGame } from "../utils/firebase-functions";

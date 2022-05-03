@@ -1,15 +1,14 @@
 import { DocumentData, where } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ApiRequestFunction } from "../../../enums/api-request-function.enum";
-import { ApiResultCode } from "../../../enums/api-result-code.enum";
-import { ApiResultStatus } from "../../../enums/api-result-status.enum";
+import { ApiRequestFunction } from "../../../enums/api/api-request-function.enum";
+import { ApiResultCode } from "../../../enums/api/api-result-code.enum";
+import { ApiResultStatus } from "../../../enums/api/api-result-status.enum";
 import {
   APIUsersRequest,
   APIUsersResponse,
 } from "../../../interfaces/api/users.interface";
 import { User } from "../../../interfaces/user.interface";
 import { CreateUser, GetUser } from "../../../utils/firebase-functions";
-import { CreateSignature } from "../../../utils/hash";
 import { GenerateUsername } from "../../../utils/words";
 
 export default async function handler(
@@ -61,7 +60,6 @@ export default async function handler(
             },
           },
         },
-        signature: "",
       };
     }
 
@@ -79,7 +77,6 @@ export default async function handler(
           user,
         },
       },
-      signature: "",
     };
   } else {
     resBody = {
@@ -95,19 +92,8 @@ export default async function handler(
           },
         },
       },
-      signature: "",
     };
   }
-
-  // Create signature
-  const dataToSign = {
-    head: resBody.response.head,
-    body: resBody.response.body,
-  };
-
-  resBody.signature = CreateSignature(JSON.stringify(dataToSign)).toString(
-    "base64"
-  );
 
   const resultCode = resBody.response.body.resultInfo.resultStatus;
 
