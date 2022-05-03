@@ -90,3 +90,38 @@ export const QUERY_GAMES = async (
     lastKey: data.response.body.lastKey,
   };
 };
+
+export const CREATE_GAME = async (
+  userId: string,
+  round: number,
+  score: number,
+  wpm: number,
+  words: string[]
+) => {
+  const res = await fetch(`http://localhost:3000/api/games`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      request: {
+        head: {
+          function: ApiRequestFunction.GAME_CREATE,
+        },
+        body: {
+          userId,
+          round,
+          score,
+          wpm,
+          words,
+        },
+      },
+    }),
+  });
+  const data: APIGamesResponse = await res.json();
+
+  return {
+    resultInfo: data.response.body.resultInfo,
+    game: data.response.body.game,
+  };
+};

@@ -14,6 +14,7 @@ import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
 import Link from "next/link";
 import DoneWords from "../components/done-words";
+import { CREATE_GAME } from "../utils/http";
 
 const Home: NextPage = () => {
   const { authUser, loading } = useAuth();
@@ -103,16 +104,15 @@ const Home: NextPage = () => {
   };
 
   const handleSaveRecord = async () => {
-    const { game: newGameRecord } = await CreateGame({
-      // because user can only save a record if he is logged in
-      userId: authUser.uid as string,
-      round: doneWords.length - 1,
-      score: userScore,
-      wpm: Number(wpm),
-      words: doneWords,
-    });
+    const { game: newGameRecord } = await CREATE_GAME(
+      authUser?.uid as string,
+      doneWords.length - 1,
+      userScore,
+      Number(wpm),
+      doneWords
+    );
 
-    if (newGameRecord.id) {
+    if (newGameRecord?.id) {
       setIsRecordSaved(true);
 
       showNotification({
