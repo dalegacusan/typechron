@@ -7,13 +7,25 @@ import Link from "next/link";
 
 const SignIn = () => {
   const { loading, signInWithGoogle, authUser } = useAuth();
-  const [isSignInError, setIsSignInError] = useState<boolean>(false);
+  const [signInError, setSignInError] = useState<{
+    isError: boolean;
+    code: string;
+    message: string;
+  }>({
+    isError: false,
+    code: "",
+    message: "",
+  });
 
   const signIn = async () => {
-    const { code } = await signInWithGoogle();
+    const { code, message } = await signInWithGoogle();
 
     if (code) {
-      setIsSignInError(true);
+      setSignInError({
+        isError: true,
+        code,
+        message,
+      });
     }
   };
 
@@ -67,15 +79,15 @@ const SignIn = () => {
             </>
           )}
 
-          {!isSignInError && !loading && authUser && (
+          {!signInError.isError && !loading && authUser && (
             <Text color="dimmed" size="sm" align="center" mt={5}>
               You are already signed in.
             </Text>
           )}
 
-          {isSignInError && (
+          {signInError.isError && (
             <Text color={red} align="center" mt={12}>
-              Failed to sign in.
+              Failed to sign in. Ref: {signInError.code}
             </Text>
           )}
         </Paper>

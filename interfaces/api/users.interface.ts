@@ -1,7 +1,6 @@
 import { DocumentData } from "firebase/firestore";
-import { ApiRequestFunction } from "../../enums/api/api-request-function.enum";
-import { ApiResultCode } from "../../enums/api/api-result-code.enum";
-import { ApiResultStatus } from "../../enums/api/api-result-status.enum";
+import { ApiRequestFunction } from "../../utils/api/enums/api-request-function.enum";
+import { ApiResultInfo } from "./api-result-info.interface";
 
 export interface APIUsersRequest {
   request: {
@@ -22,11 +21,7 @@ export interface APIUsersResponse {
       function: ApiRequestFunction;
     };
     body: {
-      resultInfo: {
-        resultStatus: ApiResultStatus;
-        resultCode: ApiResultCode;
-        resultMsg: string;
-      };
+      resultInfo: ApiResultInfo;
       user?: DocumentData; // Type User
     };
   };

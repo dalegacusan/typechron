@@ -1,8 +1,8 @@
 import { DocumentData } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ApiRequestFunction } from "../../../enums/api/api-request-function.enum";
-import { ApiResultCode } from "../../../enums/api/api-result-code.enum";
-import { ApiResultStatus } from "../../../enums/api/api-result-status.enum";
+import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
+import { ApiResultCode } from "../../../utils/api/enums/api-result-code.enum";
+import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
 import {
   APIUsersRequest,
   APIUsersResponse,
@@ -15,6 +15,12 @@ import {
 } from "../../../utils/firebase-functions";
 import { AddOneDayFromUnixTimestamp } from "../../../utils/time";
 import { GenerateUsername } from "../../../utils/words";
+import {
+  REQ_SUCCESS,
+  ResultInfo,
+  USER_NOT_FOUND,
+} from "../../../utils/api/api-result-info";
+import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,6 +29,7 @@ export default async function handler(
   const reqBody: APIUsersRequest = req.body;
   const reqFunction: ApiRequestFunction = reqBody.request.head.function;
   let resBody: APIUsersResponse = {} as APIUsersResponse;
+  let resInfo: ApiResultInfo = {} as ApiResultInfo;
 
   if (req.method === "POST") {
     let user: DocumentData | undefined;
@@ -35,8 +42,12 @@ export default async function handler(
         const { email, ...userData } = query.user;
 
         user = userData;
+
+        resInfo = REQ_SUCCESS;
       } else {
         user = query.user;
+
+        resInfo = USER_NOT_FOUND;
       }
     } else if (reqFunction === ApiRequestFunction.USER_CREATE) {
       const defaultUsername = GenerateUsername();
@@ -89,11 +100,7 @@ export default async function handler(
           function: reqFunction,
         },
         body: {
-          resultInfo: {
-            resultStatus: ApiResultStatus.SUCCESS,
-            resultCode: ApiResultCode.REQ_SUCCESS,
-            resultMsg: ApiResultStatus.SUCCESS,
-          },
+          resultInfo: resInfo,
           user,
         },
       },

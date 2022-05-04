@@ -3,7 +3,7 @@ import { Alert, Box, Button, Grid, Text, TextInput } from "@mantine/core";
 import { showNotification } from "@mantine/notifications";
 import { AlertCircle, Check, DeviceFloppy } from "tabler-icons-react";
 import { useAuth } from "../../ contexts/authUserContext";
-import { ApiResultStatus } from "../../enums/api/api-result-status.enum";
+import { ApiResultStatus } from "../../utils/api/enums/api-result-status.enum";
 import { UPDATE_USER } from "../../utils/http";
 import { AddOneDayFromUnixTimestamp } from "../../utils/time";
 

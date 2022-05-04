@@ -1,9 +1,7 @@
-import { ApiRequestFunction } from "../../enums/api/api-request-function.enum";
-import { Game } from "../game.interface";
+import { ApiRequestFunction } from "../../utils/api/enums/api-request-function.enum";
 import { DocumentData } from "firebase/firestore";
-import { ApiResultStatus } from "../../enums/api/api-result-status.enum";
-import { ApiResultCode } from "../../enums/api/api-result-code.enum";
-import { QueryOrderDirection } from "../../enums/api/query-order-direction.enum";
+import { QueryOrderDirection } from "../../utils/api/enums/query-order-direction.enum";
+import { ApiResultInfo } from "./api-result-info.interface";
 
 export interface APIGamesRequest {
   request: {
@@ -34,11 +32,7 @@ export interface APIGamesResponse {
       function: ApiRequestFunction;
     };
     body: {
-      resultInfo: {
-        resultStatus: ApiResultStatus;
-        resultCode: ApiResultCode;
-        resultMsg: string;
-      };
+      resultInfo: ApiResultInfo;
       game?: DocumentData; // Type Game
       games?: DocumentData[]; // Type Game
       lastKey?: number;

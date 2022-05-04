@@ -3,7 +3,7 @@ import { Box, Loader, Stack, Text, Title } from "@mantine/core";
 import { GetServerSidePropsContext } from "next";
 import { Game } from "../interfaces/game.interface";
 import { QUERY_GAMES } from "../utils/http";
-import { QueryOrderDirection } from "../enums/api/query-order-direction.enum";
+import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.enum";
 import GameRecordModal from "../components/modals/game-record-modal";
 import GameRecord from "../components/game-record";
 

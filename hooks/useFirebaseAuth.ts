@@ -7,7 +7,7 @@ import {
 } from "firebase/auth";
 import { firebaseAuth } from "../config/firebase-app";
 import { CREATE_USER, QUERY_USER } from "../utils/http";
-import { ApiResultCode } from "../enums/api/api-result-code.enum";
+import { ApiResultCode } from "../utils/api/enums/api-result-code.enum";
 
 export interface FormattedUser {
   uid: string;
@@ -57,7 +57,7 @@ export default function useFirebaseAuth() {
       if (qResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
         signOut();
 
-        return { code: qResultInfo.resultCode };
+        return { code: qResultInfo.resultCode, message: qResultInfo.resultMsg };
       }
 
       if (!user) {

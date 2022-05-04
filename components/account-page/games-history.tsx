@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import React, { useState } from "react";
 import { useAuth } from "../../ contexts/authUserContext";
-import { QueryOrderDirection } from "../../enums/api/query-order-direction.enum";
+import { QueryOrderDirection } from "../../utils/api/enums/query-order-direction.enum";
 import { Game } from "../../interfaces/game.interface";
 import { QUERY_GAMES } from "../../utils/http";
 import GameRecord from "../game-record";

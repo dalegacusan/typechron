@@ -1,5 +1,5 @@
-import { ApiRequestFunction } from "../enums/api/api-request-function.enum";
-import { QueryOrderDirection } from "../enums/api/query-order-direction.enum";
+import { ApiRequestFunction } from "./api/enums/api-request-function.enum";
+import { QueryOrderDirection } from "./api/enums/query-order-direction.enum";
 import { APIGamesResponse } from "../interfaces/api/games.interface";
 import { APIUsersResponse } from "../interfaces/api/users.interface";
 

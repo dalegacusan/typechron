@@ -7,7 +7,7 @@ import {
   where,
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ApiRequestFunction } from "../../../enums/api/api-request-function.enum";
+import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
 import {
   APIGamesRequest,
   APIGamesResponse,
@@ -19,8 +19,8 @@ import {
   GetUser,
   UpdateUser,
 } from "../../../utils/firebase-functions";
-import { ApiResultStatus } from "../../../enums/api/api-result-status.enum";
-import { ApiResultCode } from "../../../enums/api/api-result-code.enum";
+import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
+import { ApiResultCode } from "../../../utils/api/enums/api-result-code.enum";
 
 export default async function handler(
   req: NextApiRequest,

@@ -3,7 +3,7 @@ import { Box, Group, Loader, Tabs, Text, Title } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { Game } from "../interfaces/game.interface";
 import { QUERY_GAMES } from "../utils/http";
-import { QueryOrderDirection } from "../enums/api/query-order-direction.enum";
+import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.enum";
 import { History, Settings } from "tabler-icons-react";
 import PageNotFound from "./404";
 import GamesHistory from "../components/account-page/games-history";
