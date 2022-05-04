@@ -16,6 +16,8 @@ import {
 import { AddOneDayFromUnixTimestamp } from "../../../utils/time";
 import { GenerateUsername } from "../../../utils/words";
 import {
+  FAILED_TO_CREATE_NEW_USER,
+  REQ_FUNC_NOT_SUPPORTED,
   REQ_SUCCESS,
   ResultInfo,
   USER_NOT_FOUND,
@@ -37,7 +39,6 @@ export default async function handler(
     if (reqFunction === ApiRequestFunction.USER_QUERY) {
       const query = await GetUser(reqBody.request.body.userId as string);
 
-      // @ts-ignore
       if (query.user) {
         const { email, ...userData } = query.user;
 
@@ -45,8 +46,6 @@ export default async function handler(
 
         resInfo = REQ_SUCCESS;
       } else {
-        user = query.user;
-
         resInfo = USER_NOT_FOUND;
       }
     } else if (reqFunction === ApiRequestFunction.USER_CREATE) {
@@ -74,9 +73,15 @@ export default async function handler(
 
       const query = await CreateUser(newUser);
 
-      const { email, ...userData } = query.user;
+      if (query.user) {
+        const { email, ...userData } = query.user;
 
-      user = userData;
+        user = userData;
+
+        resInfo = REQ_SUCCESS;
+      } else {
+        resInfo = FAILED_TO_CREATE_NEW_USER;
+      }
     } else {
       resBody = {
         response: {

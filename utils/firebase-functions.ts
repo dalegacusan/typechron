@@ -31,10 +31,16 @@ export const GetUser = async (userId: string) => {
 };
 
 export const CreateUser = async (user: User) => {
-  await setDoc(doc(firebaseDb, "users", user.id), user);
+  let newUser: User | null = user;
+
+  try {
+    await setDoc(doc(firebaseDb, "users", user.id), user);
+  } catch (err) {
+    newUser = null;
+  }
 
   return {
-    user,
+    user: newUser,
   };
 };
 

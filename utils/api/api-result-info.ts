@@ -31,3 +31,9 @@ export const USER_NOT_ALLOWED_TO_CHANGE_USERNAME: ApiResultInfo = {
   resultCode: ApiResultCode.USER_NOT_ALLOWED_TO_CHANGE_USERNAME,
   resultMsg: "User is not allowed to change their username.",
 };
+
+export const FAILED_TO_CREATE_NEW_USER: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.FAILED_TO_CREATE_NEW_USER,
+  resultMsg: "Failed to create new user.",
+};

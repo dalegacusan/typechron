@@ -37,7 +37,7 @@ const formatAuthUser = (user: User): FormattedUser => {
 
 export default function useFirebaseAuth() {
   const [authUser, setAuthUser] = useState<FormattedUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const resetState = () => {
     setAuthUser(null);
@@ -46,43 +46,14 @@ export default function useFirebaseAuth() {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    const res = await signInWithPopup(firebaseAuth, provider);
-    const loggedInUser = res.user;
 
-    if (loggedInUser) {
-      const { user, resultInfo: qResultInfo } = await QUERY_USER(
-        loggedInUser.uid
-      );
-
-      if (qResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
-        signOut();
-
-        return { code: qResultInfo.resultCode, message: qResultInfo.resultMsg };
-      }
-
-      if (!user) {
-        const { user: newUser, resultInfo: cResultInfo } = await CREATE_USER(
-          loggedInUser.uid,
-          loggedInUser.email as string
-        );
-
-        if (cResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
-          signOut();
-
-          return { code: qResultInfo.resultCode };
-        }
-
-        // @ts-ignore
-        setAuthUser((prev) => ({
-          ...prev,
-          username: newUser?.username as string,
-          dateCreated: newUser?.dateCreated as number,
-          highestScoringGame: newUser?.highestScoringGame,
-        }));
-      }
+    // Need to handle "FirebaseError: Firebase: Error (auth/popup-closed-by-user)."
+    // This error happens when closing the sign in pop-up
+    try {
+      return signInWithPopup(firebaseAuth, provider);
+    } catch (err) {
+      return { code: null, message: null };
     }
-
-    return res;
   };
 
   const signOut = () => getAuth().signOut().then(resetState);
@@ -99,22 +70,39 @@ export default function useFirebaseAuth() {
     const formattedUser = formatAuthUser(authState);
 
     // Query user to get username
-    const { user, resultInfo: qResultInfo } = await QUERY_USER(
-      formattedUser.uid
-    );
+    const { user } = await QUERY_USER(formattedUser.uid);
 
-    if (qResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
-      resetState();
+    if (!user) {
+      const { user: newUser, resultInfo: cResultInfo } = await CREATE_USER(
+        formattedUser.uid,
+        formattedUser.email as string
+      );
 
-      return;
+      if (cResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
+        signOut();
+
+        return;
+      }
+
+      // @ts-ignore
+      setAuthUser((prev) => {
+        return {
+          ...formattedUser,
+          username: newUser?.username as string,
+          dateCreated: newUser?.dateCreated as number,
+          highestScoringGame: newUser?.highestScoringGame,
+        };
+      });
+    } else {
+      // @ts-ignore
+      setAuthUser((prev) => ({
+        ...formattedUser,
+        username: user?.username as string,
+        dateCreated: user?.dateCreated as number,
+        highestScoringGame: user?.highestScoringGame,
+      }));
     }
 
-    setAuthUser((prev) => ({
-      ...formattedUser,
-      username: user?.username as string,
-      dateCreated: user?.dateCreated as number,
-      highestScoringGame: user?.highestScoringGame,
-    }));
     setLoading(false);
   };
 
