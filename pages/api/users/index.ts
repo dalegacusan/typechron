@@ -1,7 +1,6 @@
 import { DocumentData } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
-import { ApiResultCode } from "../../../utils/api/enums/api-result-code.enum";
 import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
 import {
   APIUsersRequest,
@@ -18,6 +17,7 @@ import { GenerateUsername } from "../../../utils/words";
 import {
   FAILED_TO_CREATE_NEW_USER,
   REQ_FUNC_NOT_SUPPORTED,
+  REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
   USER_NOT_ALLOWED_TO_CHANGE_USERNAME,
   USER_NOT_FOUND,
@@ -142,11 +142,7 @@ export default async function handler(
           function: reqFunction,
         },
         body: {
-          resultInfo: {
-            resultStatus: ApiResultStatus.FAILURE,
-            resultCode: ApiResultCode.REQ_HTTP_METHOD_NOT_SUPPORTED,
-            resultMsg: "HTTP request method not supported.",
-          },
+          resultInfo: REQ_HTTP_METHOD_NOT_SUPPORTED,
         },
       },
     };

@@ -37,3 +37,9 @@ export const FAILED_TO_CREATE_NEW_USER: ApiResultInfo = {
   resultCode: ApiResultCode.FAILED_TO_CREATE_NEW_USER,
   resultMsg: "Failed to create new user.",
 };
+
+export const FAILED_TO_CREATE_NEW_GAME: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.FAILED_TO_CREATE_NEW_GAME,
+  resultMsg: "Failed to create new game.",
+};

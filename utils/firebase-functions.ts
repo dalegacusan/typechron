@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   doc,
+  DocumentData,
   getDoc,
   getDocs,
   query,
@@ -90,12 +91,20 @@ export const GetGames = async (constraints: Array<any>) => {
 };
 
 export const CreateGame = async (game: Game) => {
-  const newGame = await addDoc(collection(firebaseDb, "games"), game);
+  let newGame: DocumentData | null = null;
+
+  try {
+    const gameDoc = await addDoc(collection(firebaseDb, "games"), game);
+
+    newGame = {
+      id: gameDoc.id,
+      ...game,
+    };
+  } catch (err) {
+    newGame = null;
+  }
 
   return {
-    game: {
-      id: newGame.id,
-      ...game,
-    },
+    game: newGame,
   };
 };

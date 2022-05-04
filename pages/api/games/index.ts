@@ -20,7 +20,14 @@ import {
   UpdateUser,
 } from "../../../utils/firebase-functions";
 import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
-import { ApiResultCode } from "../../../utils/api/enums/api-result-code.enum";
+import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
+import {
+  FAILED_TO_CREATE_NEW_GAME,
+  REQ_FUNC_NOT_SUPPORTED,
+  REQ_HTTP_METHOD_NOT_SUPPORTED,
+  REQ_SUCCESS,
+  USER_NOT_FOUND,
+} from "../../../utils/api/api-result-info";
 
 export default async function handler(
   req: NextApiRequest,
@@ -30,6 +37,7 @@ export default async function handler(
   const reqBody: APIGamesRequest = req.body;
   const reqFunction: ApiRequestFunction = reqBody.request.head.function;
   let resBody: APIGamesResponse = {} as APIGamesResponse;
+  let resInfo: ApiResultInfo = {} as ApiResultInfo;
 
   if (req.method === "POST") {
     let game: DocumentData | undefined,
@@ -70,50 +78,49 @@ export default async function handler(
 
       games = query.games;
       lastKey = query.lastKey;
+
+      resInfo = REQ_SUCCESS;
     } else if (reqFunction === ApiRequestFunction.GAME_CREATE) {
-      const newGame: Game = {
-        userId: reqBody.request.body.userId as string,
-        round: reqBody.request.body.round as number,
-        score: reqBody.request.body.score as number,
-        wpm: reqBody.request.body.wpm as number,
-        words: reqBody.request.body.words as string[],
-        dateCreated: Date.now(),
-      };
+      const userQuery = await GetUser(reqBody.request.body.userId as string);
 
-      const gameQuery = await CreateGame(newGame);
-
-      // Update high score
-      const { user } = await GetUser(newGame.userId);
-
-      if (user && newGame.score > user.highestScoringGame.score) {
-        const { userId, ...filteredNewGameData } = newGame;
-
-        const dataTobeUpdated = {
-          highestScoringGame: {
-            gameId: gameQuery.game.id,
-            ...filteredNewGameData,
-          },
+      if (userQuery.user) {
+        const newGame: Game = {
+          userId: reqBody.request.body.userId as string,
+          round: reqBody.request.body.round as number,
+          score: reqBody.request.body.score as number,
+          wpm: reqBody.request.body.wpm as number,
+          words: reqBody.request.body.words as string[],
+          dateCreated: Date.now(),
         };
 
-        await UpdateUser(newGame.userId, dataTobeUpdated);
-      }
+        const gameQuery = await CreateGame(newGame);
 
-      game = gameQuery.game;
+        if (gameQuery.game) {
+          game = gameQuery.game;
+
+          resInfo = REQ_SUCCESS;
+
+          // Check if new high score
+          if (newGame.score > userQuery.user.highestScoringGame.score) {
+            const { userId, ...filteredNewGameData } = newGame;
+
+            const dataTobeUpdated = {
+              highestScoringGame: {
+                gameId: gameQuery.game.id,
+                ...filteredNewGameData,
+              },
+            };
+
+            await UpdateUser(newGame.userId, dataTobeUpdated);
+          }
+        } else {
+          resInfo = FAILED_TO_CREATE_NEW_GAME;
+        }
+      } else {
+        resInfo = USER_NOT_FOUND;
+      }
     } else {
-      resBody = {
-        response: {
-          head: {
-            function: reqFunction,
-          },
-          body: {
-            resultInfo: {
-              resultStatus: ApiResultStatus.FAILURE,
-              resultCode: ApiResultCode.REQ_FUNC_NOT_SUPPORTED,
-              resultMsg: "Request function not supported.",
-            },
-          },
-        },
-      };
+      resInfo = REQ_FUNC_NOT_SUPPORTED;
     }
 
     resBody = {
@@ -122,11 +129,7 @@ export default async function handler(
           function: reqFunction,
         },
         body: {
-          resultInfo: {
-            resultStatus: ApiResultStatus.SUCCESS,
-            resultCode: ApiResultCode.REQ_SUCCESS,
-            resultMsg: ApiResultStatus.SUCCESS,
-          },
+          resultInfo: resInfo,
           game,
           games,
           lastKey,
@@ -140,11 +143,7 @@ export default async function handler(
           function: reqFunction,
         },
         body: {
-          resultInfo: {
-            resultStatus: ApiResultStatus.FAILURE,
-            resultCode: ApiResultCode.REQ_HTTP_METHOD_NOT_SUPPORTED,
-            resultMsg: "HTTP request method not supported.",
-          },
+          resultInfo: REQ_HTTP_METHOD_NOT_SUPPORTED,
         },
       },
     };

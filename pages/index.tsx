@@ -5,9 +5,10 @@ import { CurrentTimeInMs } from "../utils/time";
 import { black, initialDoneWords, initialGameTimeInMs } from "../config/app";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
-import { Check, DeviceFloppy, Refresh } from "tabler-icons-react";
+import { AlertCircle, Check, DeviceFloppy, Refresh } from "tabler-icons-react";
 import { CREATE_GAME } from "../utils/http";
 import { showNotification } from "@mantine/notifications";
+import { ApiResultCode } from "../utils/api/enums/api-result-code.enum";
 import CurrentWord from "../components/current-word";
 import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
@@ -114,7 +115,7 @@ const Home: NextPage = () => {
   const handleSaveRecord = async () => {
     setIsSavingRecord(true);
 
-    const { game: newGameRecord } = await CREATE_GAME(
+    const { resultInfo } = await CREATE_GAME(
       authUser?.uid as string,
       doneWords.length - 1,
       userScore,
@@ -122,16 +123,25 @@ const Home: NextPage = () => {
       doneWords
     );
 
-    if (newGameRecord?.id) {
+    if (resultInfo.resultCode === ApiResultCode.REQ_SUCCESS) {
       setIsRecordSaved(true);
 
       showNotification({
-        id: "saved-record",
+        id: "success-create-game",
         autoClose: 5000,
-        title: "Record saved!",
+        title: "Successfully saved your record!",
         message: "Did you make it to the leaderboards?",
         color: "green",
-        icon: <Check />,
+        icon: <Check size={16} />,
+      });
+    } else {
+      showNotification({
+        id: "fail-create-game",
+        autoClose: 5000,
+        title: "Failed to save record.",
+        message: resultInfo.resultMsg,
+        color: "red",
+        icon: <AlertCircle size={16} />,
       });
     }
 
