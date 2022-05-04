@@ -54,6 +54,31 @@ export const CREATE_USER = async (userId: string, email: string) => {
   };
 };
 
+export const UPDATE_USER = async (userId: string, username: string) => {
+  const res = await fetch(`http://localhost:3000/api/users`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      request: {
+        head: {
+          function: ApiRequestFunction.USER_CREATE,
+        },
+        body: {
+          userId,
+          username,
+        },
+      },
+    }),
+  });
+  const data: APIUsersResponse = await res.json();
+
+  return {
+    resultInfo: data.response.body.resultInfo,
+  };
+};
+
 export const QUERY_GAMES = async (
   limit: number,
   orderBy: {

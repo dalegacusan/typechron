@@ -8,7 +8,11 @@ import {
   APIUsersResponse,
 } from "../../../interfaces/api/users.interface";
 import { User } from "../../../interfaces/user.interface";
-import { CreateUser, GetUser } from "../../../utils/firebase-functions";
+import {
+  CreateUser,
+  GetUser,
+  UpdateUser,
+} from "../../../utils/firebase-functions";
 import { GenerateUsername } from "../../../utils/words";
 
 export default async function handler(
@@ -27,7 +31,7 @@ export default async function handler(
 
       // @ts-ignore
       if (query.user) {
-        const { email, dateCreated: tempDateCreated, ...userData } = query.user;
+        const { email, ...userData } = query.user;
 
         user = userData;
       } else {
@@ -58,7 +62,7 @@ export default async function handler(
 
       const query = await CreateUser(newUser);
 
-      const { email, dateCreated: tempDateCreated, ...userData } = query.user;
+      const { email, ...userData } = query.user;
 
       user = userData;
     } else {
@@ -90,6 +94,34 @@ export default async function handler(
             resultMsg: ApiResultStatus.SUCCESS,
           },
           user,
+        },
+      },
+    };
+  } else if (req.method === "PUT") {
+    const resultInfo = {
+      resultStatus: ApiResultStatus.SUCCESS,
+      resultCode: ApiResultCode.REQ_SUCCESS,
+      resultMsg: ApiResultStatus.SUCCESS,
+    };
+
+    // TODO
+    // 1. Username must be 8 chars
+    // 2. User can only change username up to 3 times
+    // 3. User can update username after 1 day
+
+    const dataTobeUpdated = {
+      username: reqBody.request.body.username,
+    };
+
+    await UpdateUser(reqBody.request.body.userId as string, dataTobeUpdated);
+
+    resBody = {
+      response: {
+        head: {
+          function: reqFunction,
+        },
+        body: {
+          resultInfo,
         },
       },
     };

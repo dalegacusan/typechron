@@ -140,7 +140,7 @@ export function PageHeader() {
           <Menu.Label>{authUser.username}</Menu.Label>
 
           <Menu.Item
-            icon={<User size={14} />}
+            icon={<User size={16} />}
             onClick={() => router.push("/account")}
           >
             My Account
@@ -148,7 +148,7 @@ export function PageHeader() {
 
           <Menu.Item
             color="red"
-            icon={<Logout size={14} />}
+            icon={<Logout size={16} />}
             onClick={() => signOut()}
           >
             Sign out

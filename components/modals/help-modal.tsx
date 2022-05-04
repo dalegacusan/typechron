@@ -87,7 +87,9 @@ const HelpModal = (props: HelpModalProps) => {
       <Title order={4}>Can I change my username?</Title>
       <Space h="sm" />
 
-      <Text size="sm">No, for now.</Text>
+      <Text size="sm">
+        Yes. You can change your username 1 day after creating your account.
+      </Text>
 
       <Space h="sm" />
 

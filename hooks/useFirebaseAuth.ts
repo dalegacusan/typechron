@@ -15,6 +15,15 @@ export interface FormattedUser {
   email: string | null;
   username?: string | null;
   photoUrl: string | null;
+  dateCreated?: number;
+  highestScoringGame?: {
+    gameId: string;
+    round: number;
+    score: number;
+    wpm: number;
+    words: string[];
+    dateCreated: number;
+  };
 }
 
 const formatAuthUser = (user: User): FormattedUser => {
@@ -67,6 +76,8 @@ export default function useFirebaseAuth() {
         setAuthUser((prev) => ({
           ...prev,
           username: newUser?.username as string,
+          dateCreated: newUser?.dateCreated as number,
+          highestScoringGame: newUser?.highestScoringGame,
         }));
       }
     }
@@ -101,6 +112,8 @@ export default function useFirebaseAuth() {
     setAuthUser((prev) => ({
       ...formattedUser,
       username: user?.username as string,
+      dateCreated: user?.dateCreated as number,
+      highestScoringGame: user?.highestScoringGame,
     }));
     setLoading(false);
   };

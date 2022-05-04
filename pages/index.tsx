@@ -5,7 +5,7 @@ import { CurrentTimeInMs } from "../utils/time";
 import { black, initialDoneWords, initialGameTimeInMs } from "../config/app";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
-import { Check, Plus, Refresh } from "tabler-icons-react";
+import { Check, DeviceFloppy, Refresh } from "tabler-icons-react";
 import { CREATE_GAME } from "../utils/http";
 import { showNotification } from "@mantine/notifications";
 import CurrentWord from "../components/current-word";
@@ -238,10 +238,10 @@ const Home: NextPage = () => {
             <Button
               color="gray"
               onClick={handleSaveRecord}
-              leftIcon={<Plus size={12} />}
+              leftIcon={<DeviceFloppy size={14} />}
               loading={isSavingRecord}
             >
-              Save record
+              {isSavingRecord ? "Saving" : "Save record"}
             </Button>
           )}
       </Box>
