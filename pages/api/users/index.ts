@@ -19,7 +19,7 @@ import {
   FAILED_TO_CREATE_NEW_USER,
   REQ_FUNC_NOT_SUPPORTED,
   REQ_SUCCESS,
-  ResultInfo,
+  USER_NOT_ALLOWED_TO_CHANGE_USERNAME,
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
 import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
@@ -83,20 +83,7 @@ export default async function handler(
         resInfo = FAILED_TO_CREATE_NEW_USER;
       }
     } else {
-      resBody = {
-        response: {
-          head: {
-            function: reqFunction,
-          },
-          body: {
-            resultInfo: {
-              resultStatus: ApiResultStatus.FAILURE,
-              resultCode: ApiResultCode.REQ_FUNC_NOT_SUPPORTED,
-              resultMsg: "Request function not supported.",
-            },
-          },
-        },
-      };
+      resInfo = REQ_FUNC_NOT_SUPPORTED;
     }
 
     resBody = {
@@ -111,12 +98,6 @@ export default async function handler(
       },
     };
   } else if (req.method === "PUT") {
-    const resultInfo = {
-      resultStatus: ApiResultStatus.FAILURE,
-      resultCode: ApiResultCode.USER_NOT_FOUND,
-      resultMsg: "User does not exist.",
-    };
-
     const query = await GetUser(reqBody.request.body.userId as string);
 
     if (query.user) {
@@ -127,10 +108,7 @@ export default async function handler(
       const isOneDayPassed = Date.now() > oneDayFromCreation;
 
       if (!isOneDayPassed) {
-        resultInfo.resultStatus = ApiResultStatus.FAILURE;
-        resultInfo.resultCode =
-          ApiResultCode.USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
-        resultInfo.resultMsg = "User not allowed to change username.";
+        resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
       } else {
         const dataTobeUpdated = {
           username: reqBody.request.body.username,
@@ -141,10 +119,10 @@ export default async function handler(
           dataTobeUpdated
         );
 
-        resultInfo.resultStatus = ApiResultStatus.SUCCESS;
-        resultInfo.resultCode = ApiResultCode.REQ_SUCCESS;
-        resultInfo.resultMsg = ApiResultStatus.SUCCESS;
+        resInfo = REQ_SUCCESS;
       }
+    } else {
+      resInfo = USER_NOT_FOUND;
     }
 
     resBody = {
@@ -153,7 +131,7 @@ export default async function handler(
           function: reqFunction,
         },
         body: {
-          resultInfo,
+          resultInfo: resInfo,
         },
       },
     };
