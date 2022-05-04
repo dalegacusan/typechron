@@ -72,12 +72,12 @@ const AccountSettings = () => {
 
   useEffect(() => {
     if (!loading && authUser && authUser.dateCreated) {
-      const oneDayFromDateCreation = AddOneDayFromUnixTimestamp(
+      const oneDayFromCreation = AddOneDayFromUnixTimestamp(
         authUser.dateCreated
       );
-      const isOneDayPassed = oneDayFromDateCreation > Date.now();
+      const isOneDayPassed = Date.now() > oneDayFromCreation;
 
-      setIsUpdateDisabled(isOneDayPassed);
+      setIsUpdateDisabled(!isOneDayPassed);
     }
   }, [loading]);
 

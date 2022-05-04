@@ -13,6 +13,7 @@ import {
   GetUser,
   UpdateUser,
 } from "../../../utils/firebase-functions";
+import { AddOneDayFromUnixTimestamp } from "../../../utils/time";
 import { GenerateUsername } from "../../../utils/words";
 
 export default async function handler(
@@ -99,21 +100,40 @@ export default async function handler(
     };
   } else if (req.method === "PUT") {
     const resultInfo = {
-      resultStatus: ApiResultStatus.SUCCESS,
-      resultCode: ApiResultCode.REQ_SUCCESS,
-      resultMsg: ApiResultStatus.SUCCESS,
+      resultStatus: ApiResultStatus.FAILURE,
+      resultCode: ApiResultCode.USER_NOT_FOUND,
+      resultMsg: "User does not exist.",
     };
 
-    // TODO
-    // 1. Username must be 8 chars
-    // 2. User can only change username up to 3 times
-    // 3. User can update username after 1 day
+    const query = await GetUser(reqBody.request.body.userId as string);
 
-    const dataTobeUpdated = {
-      username: reqBody.request.body.username,
-    };
+    if (query.user) {
+      // Check if one day has passed from account creation date
+      const oneDayFromCreation = AddOneDayFromUnixTimestamp(
+        query.user.dateCreated
+      );
+      const isOneDayPassed = Date.now() > oneDayFromCreation;
 
-    await UpdateUser(reqBody.request.body.userId as string, dataTobeUpdated);
+      if (!isOneDayPassed) {
+        resultInfo.resultStatus = ApiResultStatus.FAILURE;
+        resultInfo.resultCode =
+          ApiResultCode.USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
+        resultInfo.resultMsg = "User not allowed to change username.";
+      } else {
+        const dataTobeUpdated = {
+          username: reqBody.request.body.username,
+        };
+
+        await UpdateUser(
+          reqBody.request.body.userId as string,
+          dataTobeUpdated
+        );
+
+        resultInfo.resultStatus = ApiResultStatus.SUCCESS;
+        resultInfo.resultCode = ApiResultCode.REQ_SUCCESS;
+        resultInfo.resultMsg = ApiResultStatus.SUCCESS;
+      }
+    }
 
     resBody = {
       response: {
