@@ -2,19 +2,17 @@ import type { NextPage } from "next";
 import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTimeInMs } from "../utils/time";
-import { black, initialGameTimeInMs } from "../config/app";
+import { black, initialDoneWords, initialGameTimeInMs } from "../config/app";
 import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
-import { CreateGame } from "../utils/firebase-functions";
-import { Game } from "../interfaces/game.interface";
-import { Check, Plus } from "tabler-icons-react";
+import { Check, Plus, Refresh } from "tabler-icons-react";
+import { CREATE_GAME } from "../utils/http";
 import { showNotification } from "@mantine/notifications";
 import CurrentWord from "../components/current-word";
 import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
 import Link from "next/link";
 import DoneWords from "../components/done-words";
-import { CREATE_GAME } from "../utils/http";
 
 const Home: NextPage = () => {
   const { authUser, loading } = useAuth();
@@ -22,7 +20,7 @@ const Home: NextPage = () => {
   const [userInput, setUserInput] = useState<string>("");
   const [userScore, setUserScore] = useState<number>(0);
   const [currentWord, setCurrentWord] = useState<string>("");
-  const [doneWords, setDoneWords] = useState<Array<string>>(["start"]); // 0th round will always be the word "start"
+  const [doneWords, setDoneWords] = useState<Array<string>>(initialDoneWords); // 0th round will always be the word "start"
   const [wpm, setWpm] = useState<string>("0");
   const [gameStartTime, setGameStartTime] = useState<number | undefined>(
     undefined
@@ -76,7 +74,6 @@ const Home: NextPage = () => {
     setDoneWords([]);
     setWpm("0");
     setIsRecordSaved(false);
-
     setIsInGame(true);
 
     handleInitiateRound();
@@ -102,6 +99,16 @@ const Home: NextPage = () => {
     setIsGameEnded(true);
 
     setGameStartTime(undefined);
+  };
+
+  const handleRestartGame = () => {
+    handleEndGame();
+
+    setIsGameEnded(false);
+    setUserScore(0);
+    setDoneWords(initialDoneWords);
+    setWpm("0");
+    setIsRecordSaved(false);
   };
 
   const handleSaveRecord = async () => {
@@ -204,13 +211,23 @@ const Home: NextPage = () => {
       </Paper>
 
       {/* Save record button */}
-      <Box mb={12}>
+      <Box mb={14}>
         {isGameEnded && !loading && !authUser && (
           <Link href="/login" passHref>
             <Text component="a" variant="link">
               Sign in to save your record
             </Text>
           </Link>
+        )}
+
+        {isInGame && !isGameEnded && (
+          <Button
+            color="gray"
+            onClick={handleRestartGame}
+            leftIcon={<Refresh size={12} />}
+          >
+            Restart
+          </Button>
         )}
 
         {isGameEnded &&
