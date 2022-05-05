@@ -33,6 +33,7 @@ const AccountSettings = () => {
     setIsUpdatingUser(true);
 
     const { resultInfo } = await UPDATE_USER(
+      authUser?.idToken as string,
       authUser?.uid as string,
       trimmedUsername
     );

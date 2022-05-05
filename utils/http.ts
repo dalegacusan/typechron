@@ -60,7 +60,11 @@ export const CREATE_USER = async (
   };
 };
 
-export const UPDATE_USER = async (userId: string, username: string) => {
+export const UPDATE_USER = async (
+  userIdToken: string,
+  userId: string,
+  username: string
+) => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "PUT",
     headers: {
@@ -75,6 +79,7 @@ export const UPDATE_USER = async (userId: string, username: string) => {
           userId,
           username,
         },
+        signature: ToBase64(userIdToken),
       },
     }),
   });
@@ -86,7 +91,7 @@ export const UPDATE_USER = async (userId: string, username: string) => {
 };
 
 export const QUERY_GAMES = async (
-  idToken: string,
+  userIdToken: string,
   limit: number,
   orderBy: {
     direction: QueryOrderDirection;
@@ -111,7 +116,7 @@ export const QUERY_GAMES = async (
           userId,
           lastKey,
         },
-        signature: ToBase64(idToken),
+        signature: ToBase64(userIdToken),
       },
     }),
   });
@@ -125,7 +130,7 @@ export const QUERY_GAMES = async (
 };
 
 export const CREATE_GAME = async (
-  idToken: string,
+  userIdToken: string,
   userId: string,
   round: number,
   score: number,
@@ -149,7 +154,7 @@ export const CREATE_GAME = async (
           wpm,
           words,
         },
-        signature: ToBase64(idToken),
+        signature: ToBase64(userIdToken),
       },
     }),
   });

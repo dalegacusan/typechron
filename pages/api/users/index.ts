@@ -18,6 +18,7 @@ import {
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
+  UNAUTHORIZED_USER,
   USER_NOT_ALLOWED_TO_CHANGE_USERNAME,
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
@@ -34,6 +35,8 @@ import {
   USER_UPDATE_SCHEMA,
   USER_UPDATE_TYPE,
 } from "../../../utils/api/schema/user-update";
+import { VerifyIdToken } from "../../../config/firebase-admin";
+import { FromBase64 } from "../../../utils/base64";
 
 export default async function handler(
   req: NextApiRequest,
@@ -147,35 +150,43 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const query = await GetUser(reqBody.request.body.userId);
+        const isValidIdToken: boolean = await VerifyIdToken(
+          FromBase64(reqBody.request.signature)
+        );
 
-        if (query.user) {
-          // Check if one day has passed from account creation date
-          const oneDayFromCreation = AddOneDayFromUnixTimestamp(
-            query.user.dateCreated
-          );
-          const isOneDayPassed = Date.now() > oneDayFromCreation;
-
-          if (!isOneDayPassed) {
-            resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
-          } else {
-            const dataTobeUpdated = {
-              username: reqBody.request.body.username,
-            };
-
-            const updatedUser = await UpdateUser(
-              reqBody.request.body.userId,
-              dataTobeUpdated
-            );
-
-            if (updatedUser.user) {
-              resInfo = REQ_SUCCESS;
-            } else {
-              resInfo = FAILED_TO_UPDATE_USER;
-            }
-          }
+        if (!isValidIdToken) {
+          resInfo = UNAUTHORIZED_USER;
         } else {
-          resInfo = USER_NOT_FOUND;
+          const query = await GetUser(reqBody.request.body.userId);
+
+          if (query.user) {
+            // Check if one day has passed from account creation date
+            const oneDayFromCreation = AddOneDayFromUnixTimestamp(
+              query.user.dateCreated
+            );
+            const isOneDayPassed = Date.now() > oneDayFromCreation;
+
+            if (!isOneDayPassed) {
+              resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
+            } else {
+              const dataTobeUpdated = {
+                username: reqBody.request.body.username,
+              };
+
+              const updatedUser = await UpdateUser(
+                reqBody.request.body.userId,
+                dataTobeUpdated
+              );
+
+              if (updatedUser.user) {
+                resInfo = REQ_SUCCESS;
+              } else {
+                resInfo = FAILED_TO_UPDATE_USER;
+              }
+            }
+          } else {
+            resInfo = USER_NOT_FOUND;
+          }
         }
       }
     } else {
