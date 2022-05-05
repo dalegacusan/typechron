@@ -63,7 +63,7 @@ export const UPDATE_USER = async (userId: string, username: string) => {
     body: JSON.stringify({
       request: {
         head: {
-          function: ApiRequestFunction.USER_CREATE,
+          function: ApiRequestFunction.USER_UPDATE,
         },
         body: {
           userId,

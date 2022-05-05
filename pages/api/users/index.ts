@@ -98,31 +98,35 @@ export default async function handler(
       },
     };
   } else if (req.method === "PUT") {
-    const query = await GetUser(reqBody.request.body.userId as string);
+    if (reqFunction === ApiRequestFunction.USER_UPDATE) {
+      const query = await GetUser(reqBody.request.body.userId as string);
 
-    if (query.user) {
-      // Check if one day has passed from account creation date
-      const oneDayFromCreation = AddOneDayFromUnixTimestamp(
-        query.user.dateCreated
-      );
-      const isOneDayPassed = Date.now() > oneDayFromCreation;
-
-      if (!isOneDayPassed) {
-        resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
-      } else {
-        const dataTobeUpdated = {
-          username: reqBody.request.body.username,
-        };
-
-        await UpdateUser(
-          reqBody.request.body.userId as string,
-          dataTobeUpdated
+      if (query.user) {
+        // Check if one day has passed from account creation date
+        const oneDayFromCreation = AddOneDayFromUnixTimestamp(
+          query.user.dateCreated
         );
+        const isOneDayPassed = Date.now() > oneDayFromCreation;
 
-        resInfo = REQ_SUCCESS;
+        if (!isOneDayPassed) {
+          resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
+        } else {
+          const dataTobeUpdated = {
+            username: reqBody.request.body.username,
+          };
+
+          await UpdateUser(
+            reqBody.request.body.userId as string,
+            dataTobeUpdated
+          );
+
+          resInfo = REQ_SUCCESS;
+        }
+      } else {
+        resInfo = USER_NOT_FOUND;
       }
     } else {
-      resInfo = USER_NOT_FOUND;
+      resInfo = REQ_FUNC_NOT_SUPPORTED;
     }
 
     resBody = {
