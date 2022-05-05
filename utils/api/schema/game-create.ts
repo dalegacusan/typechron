@@ -7,11 +7,11 @@ export const GAME_CREATE_SCHEMA = z.object({
       function: z.enum([ApiRequestFunction.GAME_CREATE]),
     }),
     body: z.object({
-      userId: z.string(),
+      userId: z.string().nonempty(),
       round: z.number().int(),
       score: z.number().int(),
       wpm: z.number(),
-      words: z.array(z.string()),
+      words: z.array(z.string().nonempty()).nonempty(),
     }),
   }),
 });

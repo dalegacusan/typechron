@@ -7,7 +7,7 @@ export const USER_QUERY_SCHEMA = z.object({
       function: z.enum([ApiRequestFunction.USER_QUERY]),
     }),
     body: z.object({
-      userId: z.string(),
+      userId: z.string().nonempty(),
     }),
   }),
 });

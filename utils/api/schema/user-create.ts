@@ -7,9 +7,9 @@ export const USER_CREATE_SCHEMA = z.object({
       function: z.enum([ApiRequestFunction.USER_CREATE]),
     }),
     body: z.object({
-      userId: z.string(),
-      email: z.string().email(),
-      username: z.string().min(1).max(8).optional(),
+      userId: z.string().nonempty(),
+      email: z.string().nonempty().email(),
+      username: z.string().max(8).optional(),
     }),
   }),
 });

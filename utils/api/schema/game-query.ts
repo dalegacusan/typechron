@@ -11,10 +11,10 @@ export const GAME_QUERY_SCHEMA = z.object({
       limit: z.number().int(),
       orderBy: z.object({
         direction: z.enum([QueryOrderDirection.ASC, QueryOrderDirection.DESC]),
-        fieldPath: z.string(),
+        fieldPath: z.string().nonempty(),
       }),
       lastKey: z.number().int().optional(),
-      userId: z.string().optional(),
+      userId: z.string().nonempty().optional(),
     }),
   }),
 });
