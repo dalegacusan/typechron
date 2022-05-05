@@ -38,6 +38,12 @@ export const FAILED_TO_CREATE_NEW_USER: ApiResultInfo = {
   resultMsg: "Failed to create new user.",
 };
 
+export const FAILED_TO_UPDATE_USER: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.FAILED_TO_UPDATE_USER,
+  resultMsg: "Failed to update user.",
+};
+
 export const FAILED_TO_CREATE_NEW_GAME: ApiResultInfo = {
   resultStatus: ApiResultStatus.FAILURE,
   resultCode: ApiResultCode.FAILED_TO_CREATE_NEW_GAME,

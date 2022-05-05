@@ -20,6 +20,7 @@ import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum
 import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
 import {
   FAILED_TO_CREATE_NEW_GAME,
+  FAILED_TO_UPDATE_USER,
   INVALID_REQ_BODY_PARAMS,
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
@@ -141,7 +142,14 @@ export default async function handler(
                 },
               };
 
-              await UpdateUser(newGame.userId, dataTobeUpdated);
+              const updatedUser = await UpdateUser(
+                newGame.userId,
+                dataTobeUpdated
+              );
+
+              if (!updatedUser.user) {
+                resInfo = FAILED_TO_UPDATE_USER;
+              }
             }
           } else {
             resInfo = FAILED_TO_CREATE_NEW_GAME;

@@ -13,6 +13,7 @@ import { AddOneDayFromUnixTimestamp } from "../../../utils/time";
 import { GenerateUsername } from "../../../utils/words";
 import {
   FAILED_TO_CREATE_NEW_USER,
+  FAILED_TO_UPDATE_USER,
   INVALID_REQ_BODY_PARAMS,
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
@@ -29,6 +30,10 @@ import {
   USER_CREATE_SCHEMA,
   USER_CREATE_TYPE,
 } from "../../../utils/api/schema/user-create";
+import {
+  USER_UPDATE_SCHEMA,
+  USER_UPDATE_TYPE,
+} from "../../../utils/api/schema/user-update";
 
 export default async function handler(
   req: NextApiRequest,
@@ -130,31 +135,48 @@ export default async function handler(
     };
   } else if (req.method === "PUT") {
     if (reqFunction === ApiRequestFunction.USER_UPDATE) {
-      const query = await GetUser(req.body.request.body.userId as string);
+      const reqBody: USER_UPDATE_TYPE = req.body;
+      const userUpdateSchema = USER_UPDATE_SCHEMA;
+      const schemaResult = userUpdateSchema.safeParse(reqBody);
 
-      if (query.user) {
-        // Check if one day has passed from account creation date
-        const oneDayFromCreation = AddOneDayFromUnixTimestamp(
-          query.user.dateCreated
-        );
-        const isOneDayPassed = Date.now() > oneDayFromCreation;
+      if (!schemaResult.success) {
+        const tempResInfo = INVALID_REQ_BODY_PARAMS;
+        const paramPath = schemaResult.error.issues[0].path.join(".");
 
-        if (!isOneDayPassed) {
-          resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
-        } else {
-          const dataTobeUpdated = {
-            username: req.body.request.body.username,
-          };
+        tempResInfo.resultMsg = `Invalid ${paramPath}.`;
 
-          await UpdateUser(
-            req.body.request.body.userId as string,
-            dataTobeUpdated
-          );
-
-          resInfo = REQ_SUCCESS;
-        }
+        resInfo = tempResInfo;
       } else {
-        resInfo = USER_NOT_FOUND;
+        const query = await GetUser(reqBody.request.body.userId);
+
+        if (query.user) {
+          // Check if one day has passed from account creation date
+          const oneDayFromCreation = AddOneDayFromUnixTimestamp(
+            query.user.dateCreated
+          );
+          const isOneDayPassed = Date.now() > oneDayFromCreation;
+
+          if (!isOneDayPassed) {
+            resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
+          } else {
+            const dataTobeUpdated = {
+              username: reqBody.request.body.username,
+            };
+
+            const updatedUser = await UpdateUser(
+              reqBody.request.body.userId,
+              dataTobeUpdated
+            );
+
+            if (updatedUser.user) {
+              resInfo = REQ_SUCCESS;
+            } else {
+              resInfo = FAILED_TO_UPDATE_USER;
+            }
+          }
+        } else {
+          resInfo = USER_NOT_FOUND;
+        }
       }
     } else {
       resInfo = REQ_FUNC_NOT_SUPPORTED;

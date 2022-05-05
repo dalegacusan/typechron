@@ -17,17 +17,25 @@ import { User } from "../interfaces/user.interface";
 // ================
 
 export const GetUser = async (userId: string) => {
-  const userRef = doc(firebaseDb, "users", userId);
-  const userSnap = await getDoc(userRef);
+  let user: DocumentData | null;
 
-  if (!userSnap.exists()) {
-    return {
-      user: undefined,
-    };
+  try {
+    const userRef = doc(firebaseDb, "users", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      return {
+        user: null,
+      };
+    }
+
+    user = userSnap.data();
+  } catch (err) {
+    user = null;
   }
 
   return {
-    user: userSnap.data(),
+    user,
   };
 };
 
@@ -46,9 +54,20 @@ export const CreateUser = async (user: User) => {
 };
 
 export const UpdateUser = async (userId: string, dataToBeUpdated: any) => {
-  const usersRef = doc(firebaseDb, "users", userId);
+  let updatedUser = null;
 
-  await updateDoc(usersRef, dataToBeUpdated);
+  try {
+    const usersRef = doc(firebaseDb, "users", userId);
+    await updateDoc(usersRef, dataToBeUpdated);
+
+    updatedUser = { id: userId };
+  } catch (err) {
+    updatedUser = null;
+  }
+
+  return {
+    user: updatedUser,
+  };
 };
 
 // Games
