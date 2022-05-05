@@ -4,7 +4,9 @@ import { useAuth } from "../ contexts/authUserContext";
 import { Game } from "../interfaces/game.interface";
 import { QUERY_GAMES } from "../utils/http";
 import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.enum";
-import { History, Settings } from "tabler-icons-react";
+import { AlertCircle, History, Settings } from "tabler-icons-react";
+import { showNotification } from "@mantine/notifications";
+import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
 import PageNotFound from "./404";
 import GamesHistory from "../components/account-page/games-history";
 import AccountSettings from "../components/account-page/settings";
@@ -23,13 +25,35 @@ const UserAccount = () => {
         authUser.uid
       )
         .then((data) => {
-          const { games, lastKey } = data;
+          if (data.resultInfo.resultStatus === ApiResultStatus.FAILURE) {
+            showNotification({
+              id: "fail-query-games",
+              autoClose: 5000,
+              title: "Something went wrong.",
+              message: `Failed to retrieve records. Ref: ${data.resultInfo.resultCode}`,
+              color: "red",
+              icon: <AlertCircle size={16} />,
+            });
 
-          //@ts-ignore
-          setGames(games);
-          setGameLastKey(lastKey);
+            setGames([]);
+          } else {
+            const { games, lastKey } = data;
+
+            //@ts-ignore
+            setGames(games);
+            setGameLastKey(lastKey);
+          }
         })
-        .catch(() => {});
+        .catch((err) => {
+          showNotification({
+            id: "fail-query-games",
+            autoClose: 5000,
+            title: "Something went wrong.",
+            message: "Failed to retrieve records.",
+            color: "red",
+            icon: <AlertCircle size={16} />,
+          });
+        });
     }
   }, [loading]);
 
