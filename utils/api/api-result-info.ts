@@ -55,3 +55,9 @@ export const INVALID_REQ_BODY_PARAMS: ApiResultInfo = {
   resultCode: ApiResultCode.INVALID_REQ_PARAMS,
   resultMsg: "Invalid request parameters", // will get overwritten
 };
+
+export const UNAUTHORIZED_USER: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.UNAUTHORIZED_USER,
+  resultMsg: "Unauthorized: Access is denied due to invalid credentials.",
+};

@@ -25,6 +25,7 @@ import {
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
+  UNAUTHORIZED_USER,
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
 import {
@@ -35,6 +36,8 @@ import {
   GAME_CREATE_SCHEMA,
   GAME_CREATE_TYPE,
 } from "../../../utils/api/schema/game-create";
+import { VerifyIdToken } from "../../../config/firebase-admin";
+import { FromBase64 } from "../../../utils/base64";
 
 export default async function handler(
   req: NextApiRequest,
@@ -63,41 +66,51 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        if (reqBody.request.body.userId) {
-          constraints.push(where("userId", "==", reqBody.request.body.userId));
-        }
-
-        constraints.push(
-          orderBy(
-            reqBody.request.body.orderBy.fieldPath,
-            reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
-          )
+        const isValidIdToken: boolean = await VerifyIdToken(
+          FromBase64(reqBody.request.signature)
         );
 
-        // Handle 2 similar "orderBy" to field "dateCreated"
-        // For My Account page, must use only "dateCreated" field path
-        // For Leaderboards page, must use both "score" and "dateCreated" field paths
-        if (reqBody.request.body.orderBy.fieldPath !== "dateCreated") {
+        if (!isValidIdToken) {
+          resInfo = UNAUTHORIZED_USER;
+        } else {
+          if (reqBody.request.body.userId) {
+            constraints.push(
+              where("userId", "==", reqBody.request.body.userId)
+            );
+          }
+
           constraints.push(
             orderBy(
-              "dateCreated",
+              reqBody.request.body.orderBy.fieldPath,
               reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
             )
           );
+
+          // Handle 2 similar "orderBy" to field "dateCreated"
+          // For My Account page, must use only "dateCreated" field path
+          // For Leaderboards page, must use both "score" and "dateCreated" field paths
+          if (reqBody.request.body.orderBy.fieldPath !== "dateCreated") {
+            constraints.push(
+              orderBy(
+                "dateCreated",
+                reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
+              )
+            );
+          }
+
+          if (reqBody.request.body.lastKey) {
+            constraints.push(startAfter(reqBody.request.body.lastKey));
+          }
+
+          constraints.push(limit(reqBody.request.body.limit));
+
+          const query = await GetGames(constraints);
+
+          games = query.games;
+          lastKey = query.lastKey;
+
+          resInfo = REQ_SUCCESS;
         }
-
-        if (reqBody.request.body.lastKey) {
-          constraints.push(startAfter(reqBody.request.body.lastKey));
-        }
-
-        constraints.push(limit(reqBody.request.body.limit));
-
-        const query = await GetGames(constraints);
-
-        games = query.games;
-        lastKey = query.lastKey;
-
-        resInfo = REQ_SUCCESS;
       }
     } else if (reqFunction === ApiRequestFunction.GAME_CREATE) {
       const reqBody: GAME_CREATE_TYPE = req.body;

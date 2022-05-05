@@ -14,6 +14,8 @@
     "@mantine/next": "^4.2.1",
     "@mantine/notifications": "^4.2.2",
     "firebase": "^9.7.0",
+    "firebase-admin": "^10.1.0",
+    "js-base64": "^3.7.2",
     "next": "12.1.5",
     "random-words": "^1.1.2",
     "react": "18.1.0",

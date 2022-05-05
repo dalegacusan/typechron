@@ -20,6 +20,7 @@ const UserAccount = () => {
   useEffect(() => {
     if (!loading && authUser) {
       QUERY_GAMES(
+        authUser.idToken as string,
         10,
         { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },
         authUser.uid

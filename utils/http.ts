@@ -2,6 +2,7 @@ import { ApiRequestFunction } from "./api/enums/api-request-function.enum";
 import { QueryOrderDirection } from "./api/enums/query-order-direction.enum";
 import { APIGamesResponse } from "../interfaces/api/games.interface";
 import { APIUsersResponse } from "../interfaces/api/users.interface";
+import { ToBase64 } from "./base64";
 
 export const QUERY_USER = async (userId: string) => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
@@ -85,6 +86,7 @@ export const UPDATE_USER = async (userId: string, username: string) => {
 };
 
 export const QUERY_GAMES = async (
+  idToken: string,
   limit: number,
   orderBy: {
     direction: QueryOrderDirection;
@@ -109,6 +111,7 @@ export const QUERY_GAMES = async (
           userId,
           lastKey,
         },
+        signature: ToBase64(idToken),
       },
     }),
   });

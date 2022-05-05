@@ -11,6 +11,7 @@ import { ApiResultCode } from "../utils/api/enums/api-result-code.enum";
 import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
 
 export interface FormattedUser {
+  idToken?: string;
   uid: string;
   displayName: string | null;
   email: string | null;
@@ -68,6 +69,8 @@ export default function useFirebaseAuth() {
 
     setLoading(true);
 
+    const userIdToken = await authState.getIdToken();
+
     const formattedUser = formatAuthUser(authState);
 
     // Query user to get username
@@ -77,6 +80,7 @@ export default function useFirebaseAuth() {
       // @ts-ignore
       setAuthUser((prev) => ({
         ...formattedUser,
+        idToken: userIdToken,
         username: user?.username as string,
         dateCreated: user?.dateCreated as number,
         highestScoringGame: user?.highestScoringGame,
@@ -105,6 +109,7 @@ export default function useFirebaseAuth() {
         setAuthUser((prev) => {
           return {
             ...formattedUser,
+            idToken: userIdToken,
             username: newUser?.username as string,
             dateCreated: newUser?.dateCreated as number,
             highestScoringGame: newUser?.highestScoringGame,

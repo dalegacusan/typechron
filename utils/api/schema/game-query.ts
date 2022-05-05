@@ -16,6 +16,7 @@ export const GAME_QUERY_SCHEMA = z.object({
       lastKey: z.number().int().optional(),
       userId: z.string().nonempty().optional(),
     }),
+    signature: z.string().nonempty(),
   }),
 });
 
