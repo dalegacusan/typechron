@@ -95,7 +95,7 @@ export default function useFirebaseAuth() {
           formattedUser.email as string
         );
 
-        if (cResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
+        if (cResultInfo.resultStatus !== ApiResultStatus.SUCCESS) {
           signOut();
 
           return;

@@ -28,7 +28,11 @@ export const QUERY_USER = async (userId: string) => {
   };
 };
 
-export const CREATE_USER = async (userId: string, email: string) => {
+export const CREATE_USER = async (
+  userId: string,
+  email: string,
+  username?: string
+) => {
   const res = await fetch(`http://localhost:3000/api/users`, {
     method: "POST",
     headers: {
@@ -42,6 +46,7 @@ export const CREATE_USER = async (userId: string, email: string) => {
         body: {
           userId,
           email,
+          username,
         },
       },
     }),

@@ -25,6 +25,10 @@ import {
   USER_QUERY_SCHEMA,
   USER_QUERY_TYPE,
 } from "../../../utils/api/schema/user-query";
+import {
+  USER_CREATE_SCHEMA,
+  USER_CREATE_TYPE,
+} from "../../../utils/api/schema/user-create";
 
 export default async function handler(
   req: NextApiRequest,
@@ -63,38 +67,51 @@ export default async function handler(
         }
       }
     } else if (reqFunction === ApiRequestFunction.USER_CREATE) {
-      const defaultUsername = GenerateUsername();
-      const dateCreated = Date.now();
+      const reqBody: USER_CREATE_TYPE = req.body;
+      const userCreateSchema = USER_CREATE_SCHEMA;
+      const schemaResult = userCreateSchema.safeParse(reqBody);
 
-      const newUser: User = {
-        id: req.body.request.body.userId as string,
-        email: req.body.request.body.email as string,
-        username: defaultUsername,
-        dateCreated,
-        highestScoringGame: {
-          gameId: "",
-          round: 0,
-          score: 0,
-          wpm: 0,
-          words: [],
-          dateCreated,
-        },
-      };
+      if (!schemaResult.success) {
+        const tempResInfo = INVALID_REQ_BODY_PARAMS;
+        const paramPath = schemaResult.error.issues[0].path.join(".");
 
-      if (req.body.request.body.username) {
-        newUser.username = req.body.request.body.username;
-      }
+        tempResInfo.resultMsg = `Invalid ${paramPath}.`;
 
-      const query = await CreateUser(newUser);
-
-      if (query.user) {
-        const { email, ...userData } = query.user;
-
-        user = userData;
-
-        resInfo = REQ_SUCCESS;
+        resInfo = tempResInfo;
       } else {
-        resInfo = FAILED_TO_CREATE_NEW_USER;
+        const defaultUsername = GenerateUsername();
+        const dateCreated = Date.now();
+
+        const newUser: User = {
+          id: reqBody.request.body.userId,
+          email: reqBody.request.body.email,
+          username: defaultUsername,
+          dateCreated,
+          highestScoringGame: {
+            gameId: "",
+            round: 0,
+            score: 0,
+            wpm: 0,
+            words: [],
+            dateCreated,
+          },
+        };
+
+        if (reqBody.request.body.username) {
+          newUser.username = reqBody.request.body.username;
+        }
+
+        const query = await CreateUser(newUser);
+
+        if (query.user) {
+          const { email, ...userData } = query.user;
+
+          user = userData;
+
+          resInfo = REQ_SUCCESS;
+        } else {
+          resInfo = FAILED_TO_CREATE_NEW_USER;
+        }
       }
     } else {
       resInfo = REQ_FUNC_NOT_SUPPORTED;
