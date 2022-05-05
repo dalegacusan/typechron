@@ -1,16 +1,14 @@
-import { Box, Divider, Group, Modal, Space, Text } from "@mantine/core";
+import { Box, Divider, Group, Space, Text } from "@mantine/core";
 import { Game } from "../../interfaces/game.interface";
 import React from "react";
 import DoneWords from "../done-words";
 
-interface GameRecordModalProps {
+interface GameRecordModalContentProps {
   game: Game;
-  isGameModalOpened: boolean;
-  setIsGameModalOpened: (isOpened: boolean) => void;
 }
 
-const GameRecordModal = (props: GameRecordModalProps) => {
-  const { game, isGameModalOpened, setIsGameModalOpened } = props;
+const GameRecordModalContent = (props: GameRecordModalContentProps) => {
+  const { game } = props;
 
   const date = new Date(game.dateCreated as number);
   const year = date.getFullYear(); // 2020
@@ -18,11 +16,7 @@ const GameRecordModal = (props: GameRecordModalProps) => {
   const day = date.getDate().toString().padStart(2, "0"); // "09"
 
   return (
-    <Modal
-      opened={isGameModalOpened}
-      onClose={() => setIsGameModalOpened(false)}
-      title="Words List"
-    >
+    <Box>
       <Divider my="sm" />
       <Space h="md" />
 
@@ -40,8 +34,8 @@ const GameRecordModal = (props: GameRecordModalProps) => {
           {`${month}/${day}/${year}`}
         </Text>
       </Group>
-    </Modal>
+    </Box>
   );
 };
 
-export default GameRecordModal;
+export default GameRecordModalContent;

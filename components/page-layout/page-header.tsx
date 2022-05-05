@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   createStyles,
   Header,
@@ -17,7 +17,8 @@ import { useAuth } from "../../ contexts/authUserContext";
 import { useRouter } from "next/router";
 import { Logout, User } from "tabler-icons-react";
 import { useBooleanToggle } from "@mantine/hooks";
-import HelpModal from "../modals/help-modal";
+import { useModals } from "@mantine/modals";
+import HelpModalContent from "../modal-content/help-modal-content";
 import Link from "next/link";
 
 const HEADER_HEIGHT = 70;
@@ -89,10 +90,16 @@ const useStyles = createStyles((theme) => ({
 export function PageHeader() {
   const { classes } = useStyles();
   const { authUser, loading, signOut } = useAuth();
-  const router = useRouter();
   const [opened, toggleOpened] = useBooleanToggle(false);
+  const modals = useModals();
+  const router = useRouter();
 
-  const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
+  const openHelpModal = () => {
+    const id = modals.openModal({
+      title: "Help",
+      children: <HelpModalContent />,
+    });
+  };
 
   const defaultHeaderItems = [
     <>
@@ -106,7 +113,7 @@ export function PageHeader() {
       </a>
     </>,
     <>
-      <a className={classes.link} onClick={() => setIsOpenModal(true)}>
+      <a className={classes.link} onClick={() => openHelpModal()}>
         Help
       </a>
     </>,
@@ -182,7 +189,6 @@ export function PageHeader() {
 
   return (
     <Header height={HEADER_HEIGHT} mb={70} className={classes.root}>
-      <HelpModal isOpenModal={isOpenModal} setIsOpenModal={setIsOpenModal} />
       <Container size="sm" className={classes.header}>
         <Link href="/" passHref>
           <Title order={3} style={{ cursor: "pointer" }}>

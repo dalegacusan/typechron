@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Loader, Stack, Text, Title } from "@mantine/core";
 import { GetServerSidePropsContext } from "next";
 import { Game } from "../interfaces/game.interface";
 import { QUERY_GAMES } from "../utils/http";
 import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.enum";
-import GameRecordModal from "../components/modals/game-record-modal";
+import { useModals } from "@mantine/modals";
+import GameRecordModalContent from "../components/modal-content/game-record-modal-content";
 import GameRecord from "../components/game-record";
 
 interface LeaderboardsProps {
@@ -12,24 +13,19 @@ interface LeaderboardsProps {
 }
 
 const Leaderboards = (props: LeaderboardsProps) => {
-  const [isGameModalOpened, setIsGameModalOpened] = useState<boolean>(false);
-  const [gameToDisplayInModal, setGameToDisplayInModal] = useState<Game>();
+  const modals = useModals();
 
-  const handleRecordClick = (game: Game) => {
-    setGameToDisplayInModal(game);
-    setIsGameModalOpened(true);
+  const openGameRecordModal = (game: Game) => {
+    if (game) {
+      const id = modals.openModal({
+        title: "Words List",
+        children: <GameRecordModalContent game={game} />,
+      });
+    }
   };
 
   return (
     <Box mb={70}>
-      {gameToDisplayInModal && (
-        <GameRecordModal
-          game={gameToDisplayInModal}
-          isGameModalOpened={isGameModalOpened}
-          setIsGameModalOpened={setIsGameModalOpened}
-        />
-      )}
-
       <Title order={2}>Leaderboards</Title>
       <Text size="sm" color="dimmed" mt={4}>
         Click on a record for more information
@@ -50,7 +46,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
                   key={game.id}
                   index={idx}
                   game={game}
-                  handleRecordClick={() => handleRecordClick(game)}
+                  handleRecordClick={() => openGameRecordModal(game)}
                   isLeaderboard={true}
                 />
               );

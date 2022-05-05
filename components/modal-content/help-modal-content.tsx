@@ -1,41 +1,22 @@
 import React from "react";
 import {
   Alert,
+  Box,
   Code,
   Divider,
-  Modal,
   Space,
   Text,
   Title,
   Tooltip,
-  useMantineTheme,
 } from "@mantine/core";
 import { BrandGithub, InfoCircle } from "tabler-icons-react";
 import Link from "next/link";
 
-interface HelpModalProps {
-  isOpenModal: boolean;
-  setIsOpenModal: (v: boolean) => void;
-}
+interface HelpModalContentProps {}
 
-const HelpModal = (props: HelpModalProps) => {
-  const { isOpenModal, setIsOpenModal } = props;
-  const theme = useMantineTheme();
-
+const HelpModalContent = (props: HelpModalContentProps) => {
   return (
-    <Modal
-      opened={isOpenModal}
-      onClose={() => setIsOpenModal(false)}
-      overlayColor={
-        theme.colorScheme === "dark"
-          ? theme.colors.dark[9]
-          : theme.colors.gray[2]
-      }
-      overlayOpacity={0.55}
-      overlayBlur={3}
-      title="Help"
-      centered
-    >
+    <Box>
       <Divider my="sm" />
       <Space h="md" />
 
@@ -104,8 +85,8 @@ const HelpModal = (props: HelpModalProps) => {
           </a>
         </Tooltip>
       </Text>
-    </Modal>
+    </Box>
   );
 };
 
-export default HelpModal;
+export default HelpModalContent;

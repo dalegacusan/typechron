@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mantine/core": "^4.2.1",
+    "@mantine/modals": "^4.2.2",
     "@mantine/next": "^4.2.1",
     "@mantine/notifications": "^4.2.2",
     "firebase": "^9.7.0",

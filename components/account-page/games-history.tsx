@@ -8,13 +8,14 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../../ contexts/authUserContext";
 import { QueryOrderDirection } from "../../utils/api/enums/query-order-direction.enum";
 import { Game } from "../../interfaces/game.interface";
 import { QUERY_GAMES } from "../../utils/http";
+import { useModals } from "@mantine/modals";
 import GameRecord from "../game-record";
-import GameRecordModal from "../modals/game-record-modal";
+import GameRecordModalContent from "../modal-content/game-record-modal-content";
 
 interface GamesHistoryProps {
   games: Game[] | undefined;
@@ -35,12 +36,15 @@ const GamesHistory = (props: GamesHistoryProps) => {
     setIsLoadingNextGames,
   } = props;
   const { authUser, loading } = useAuth();
-  const [isGameModalOpened, setIsGameModalOpened] = useState<boolean>(false);
-  const [gameToDisplayInModal, setGameToDisplayInModal] = useState<Game>();
+  const modals = useModals();
 
-  const handleRecordClick = (game: any) => {
-    setGameToDisplayInModal(game);
-    setIsGameModalOpened(true);
+  const openGameRecordModal = (game: any) => {
+    if (game) {
+      const id = modals.openModal({
+        title: "Words List",
+        children: <GameRecordModalContent game={game} />,
+      });
+    }
   };
 
   const getMoreGames = (lastKey: number | undefined) => {
@@ -68,14 +72,6 @@ const GamesHistory = (props: GamesHistoryProps) => {
 
   return (
     <Box mt={20}>
-      {gameToDisplayInModal && (
-        <GameRecordModal
-          game={gameToDisplayInModal}
-          isGameModalOpened={isGameModalOpened}
-          setIsGameModalOpened={setIsGameModalOpened}
-        />
-      )}
-
       {!games && <Loader size="sm" />}
 
       {games && games.length === 0 && (
@@ -104,7 +100,7 @@ const GamesHistory = (props: GamesHistoryProps) => {
                     };
                   }}
                   onClick={() =>
-                    handleRecordClick(authUser?.highestScoringGame)
+                    openGameRecordModal(authUser?.highestScoringGame)
                   }
                   mt={10}
                   mb={35}
@@ -137,7 +133,7 @@ const GamesHistory = (props: GamesHistoryProps) => {
                   key={game.id}
                   index={idx}
                   game={game}
-                  handleRecordClick={() => handleRecordClick(game)}
+                  handleRecordClick={() => openGameRecordModal(game)}
                   isLeaderboard={false}
                 />
               );
