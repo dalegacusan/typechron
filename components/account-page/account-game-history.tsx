@@ -17,7 +17,7 @@ import { useModals } from "@mantine/modals";
 import GameRecord from "../game-record";
 import GameRecordModalContent from "../modal-content/game-record-modal-content";
 
-interface GamesHistoryProps {
+interface AccountGameProps {
   games: Game[] | undefined;
   setGames: (games: Game[]) => void;
   gameLastKey: number | undefined;
@@ -26,7 +26,7 @@ interface GamesHistoryProps {
   setIsLoadingNextGames: (isLoading: boolean) => void;
 }
 
-const GamesHistory = (props: GamesHistoryProps) => {
+const AccountGameHistory = (props: AccountGameProps) => {
   const {
     games,
     setGames,
@@ -40,7 +40,7 @@ const GamesHistory = (props: GamesHistoryProps) => {
 
   const openGameRecordModal = (game: any) => {
     if (game) {
-      const id = modals.openModal({
+      modals.openModal({
         title: "Words List",
         children: <GameRecordModalContent game={game} />,
       });
@@ -161,4 +161,4 @@ const GamesHistory = (props: GamesHistoryProps) => {
   );
 };
 
-export default GamesHistory;
+export default AccountGameHistory;

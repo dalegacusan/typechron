@@ -1,6 +1,5 @@
 import React from "react";
 import { Box, Loader, Stack, Text, Title } from "@mantine/core";
-import { GetServerSidePropsContext } from "next";
 import { Game } from "../interfaces/game.interface";
 import { QUERY_GAMES } from "../utils/http";
 import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.enum";
@@ -17,7 +16,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
 
   const openGameRecordModal = (game: Game) => {
     if (game) {
-      const id = modals.openModal({
+      modals.openModal({
         title: "Words List",
         children: <GameRecordModalContent game={game} />,
       });
@@ -60,7 +59,7 @@ const Leaderboards = (props: LeaderboardsProps) => {
 
 export default Leaderboards;
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
+export async function getServerSideProps() {
   const { games } = await QUERY_GAMES(10, {
     direction: QueryOrderDirection.DESC,
     fieldPath: "score",

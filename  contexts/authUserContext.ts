@@ -1,11 +1,10 @@
-import { UserCredential } from "firebase/auth";
 import { createContext, useContext } from "react";
 import { FormattedUser } from "../hooks/useFirebaseAuth";
 
 export const AuthUserContext = createContext<{
   authUser: FormattedUser | null;
   loading: boolean;
-  signInWithGoogle: any; // TODO: () => UserCredential
+  signInWithGoogle: any;
   signOut: () => void;
 }>({
   authUser: null,

@@ -12,9 +12,7 @@ import {
 import { BrandGithub, InfoCircle } from "tabler-icons-react";
 import Link from "next/link";
 
-interface HelpModalContentProps {}
-
-const HelpModalContent = (props: HelpModalContentProps) => {
+const HelpModalContent = () => {
   return (
     <Box>
       <Divider my="sm" />
@@ -49,7 +47,7 @@ const HelpModalContent = (props: HelpModalContentProps) => {
 
       <Text size="sm">
         You can join the leaderboards when you are{" "}
-        <Link href="/login">
+        <Link href="/login" passHref>
           <Text
             variant="link"
             component="a"

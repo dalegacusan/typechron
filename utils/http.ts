@@ -4,7 +4,7 @@ import { APIGamesResponse } from "../interfaces/api/games.interface";
 import { APIUsersResponse } from "../interfaces/api/users.interface";
 
 export const QUERY_USER = async (userId: string) => {
-  const res = await fetch(`http://localhost:3000/api/users`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,7 +33,7 @@ export const CREATE_USER = async (
   email: string,
   username?: string
 ) => {
-  const res = await fetch(`http://localhost:3000/api/users`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -60,7 +60,7 @@ export const CREATE_USER = async (
 };
 
 export const UPDATE_USER = async (userId: string, username: string) => {
-  const res = await fetch(`http://localhost:3000/api/users`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -93,7 +93,7 @@ export const QUERY_GAMES = async (
   userId?: string,
   lastKey?: number
 ) => {
-  const res = await fetch(`http://localhost:3000/api/games`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -128,7 +128,7 @@ export const CREATE_GAME = async (
   wpm: number,
   words: string[]
 ) => {
-  const res = await fetch(`http://localhost:3000/api/games`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

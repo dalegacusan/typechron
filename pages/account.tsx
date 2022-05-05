@@ -8,8 +8,8 @@ import { AlertCircle, History, Settings } from "tabler-icons-react";
 import { showNotification } from "@mantine/notifications";
 import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
 import PageNotFound from "./404";
-import GamesHistory from "../components/account-page/games-history";
-import AccountSettings from "../components/account-page/settings";
+import AccountGameHistory from "../components/account-page/account-game-history";
+import AccountSettings from "../components/account-page/account-settings";
 
 const UserAccount = () => {
   const { authUser, loading } = useAuth();
@@ -44,7 +44,7 @@ const UserAccount = () => {
             setGameLastKey(lastKey);
           }
         })
-        .catch((err) => {
+        .catch(() => {
           showNotification({
             id: "fail-query-games",
             autoClose: 5000,
@@ -83,7 +83,7 @@ const UserAccount = () => {
 
           <Tabs color="blue" mt={30}>
             <Tabs.Tab label="History" icon={<History size={16} />}>
-              <GamesHistory
+              <AccountGameHistory
                 games={games}
                 setGames={setGames}
                 gameLastKey={gameLastKey}

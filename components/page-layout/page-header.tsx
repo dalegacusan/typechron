@@ -95,7 +95,7 @@ export function PageHeader() {
   const router = useRouter();
 
   const openHelpModal = () => {
-    const id = modals.openModal({
+    modals.openModal({
       title: "Help",
       children: <HelpModalContent />,
     });
