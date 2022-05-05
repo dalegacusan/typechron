@@ -2,10 +2,7 @@ import { DocumentData } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
 import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
-import {
-  APIUsersRequest,
-  APIUsersResponse,
-} from "../../../interfaces/api/users.interface";
+import { APIUsersResponse } from "../../../interfaces/api/users.interface";
 import { User } from "../../../interfaces/user.interface";
 import {
   CreateUser,
@@ -16,6 +13,7 @@ import { AddOneDayFromUnixTimestamp } from "../../../utils/time";
 import { GenerateUsername } from "../../../utils/words";
 import {
   FAILED_TO_CREATE_NEW_USER,
+  INVALID_REQ_BODY_PARAMS,
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
@@ -23,13 +21,16 @@ import {
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
 import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
+import {
+  USER_QUERY_SCHEMA,
+  USER_QUERY_TYPE,
+} from "../../../utils/api/schema/user-query";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const reqBody: APIUsersRequest = req.body;
-  const reqFunction: ApiRequestFunction = reqBody.request.head.function;
+  const reqFunction: ApiRequestFunction = req.body?.request?.head?.function;
   let resBody: APIUsersResponse = {} as APIUsersResponse;
   let resInfo: ApiResultInfo = {} as ApiResultInfo;
 
@@ -37,24 +38,37 @@ export default async function handler(
     let user: DocumentData | undefined;
 
     if (reqFunction === ApiRequestFunction.USER_QUERY) {
-      const query = await GetUser(reqBody.request.body.userId as string);
+      const reqBody: USER_QUERY_TYPE = req.body;
+      const userQuerySchema = USER_QUERY_SCHEMA;
+      const schemaResult = userQuerySchema.safeParse(reqBody);
 
-      if (query.user) {
-        const { email, ...userData } = query.user;
+      if (!schemaResult.success) {
+        const tempResInfo = INVALID_REQ_BODY_PARAMS;
+        const paramPath = schemaResult.error.issues[0].path.join(".");
 
-        user = userData;
+        tempResInfo.resultMsg = `Invalid ${paramPath}.`;
 
-        resInfo = REQ_SUCCESS;
+        resInfo = tempResInfo;
       } else {
-        resInfo = USER_NOT_FOUND;
+        const query = await GetUser(reqBody.request.body.userId);
+
+        if (query.user) {
+          const { email, ...userData } = query.user;
+
+          user = userData;
+
+          resInfo = REQ_SUCCESS;
+        } else {
+          resInfo = USER_NOT_FOUND;
+        }
       }
     } else if (reqFunction === ApiRequestFunction.USER_CREATE) {
       const defaultUsername = GenerateUsername();
       const dateCreated = Date.now();
 
       const newUser: User = {
-        id: reqBody.request.body.userId as string,
-        email: reqBody.request.body.email as string,
+        id: req.body.request.body.userId as string,
+        email: req.body.request.body.email as string,
         username: defaultUsername,
         dateCreated,
         highestScoringGame: {
@@ -67,8 +81,8 @@ export default async function handler(
         },
       };
 
-      if (reqBody.request.body.username) {
-        newUser.username = reqBody.request.body.username;
+      if (req.body.request.body.username) {
+        newUser.username = req.body.request.body.username;
       }
 
       const query = await CreateUser(newUser);
@@ -99,7 +113,7 @@ export default async function handler(
     };
   } else if (req.method === "PUT") {
     if (reqFunction === ApiRequestFunction.USER_UPDATE) {
-      const query = await GetUser(reqBody.request.body.userId as string);
+      const query = await GetUser(req.body.request.body.userId as string);
 
       if (query.user) {
         // Check if one day has passed from account creation date
@@ -112,11 +126,11 @@ export default async function handler(
           resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
         } else {
           const dataTobeUpdated = {
-            username: reqBody.request.body.username,
+            username: req.body.request.body.username,
           };
 
           await UpdateUser(
-            reqBody.request.body.userId as string,
+            req.body.request.body.userId as string,
             dataTobeUpdated
           );
 

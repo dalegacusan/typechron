@@ -8,6 +8,7 @@ import {
 import { firebaseAuth } from "../config/firebase-app";
 import { CREATE_USER, QUERY_USER } from "../utils/http";
 import { ApiResultCode } from "../utils/api/enums/api-result-code.enum";
+import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
 
 export interface FormattedUser {
   uid: string;
@@ -70,30 +71,9 @@ export default function useFirebaseAuth() {
     const formattedUser = formatAuthUser(authState);
 
     // Query user to get username
-    const { user } = await QUERY_USER(formattedUser.uid);
+    const { user, resultInfo } = await QUERY_USER(formattedUser.uid);
 
-    if (!user) {
-      const { user: newUser, resultInfo: cResultInfo } = await CREATE_USER(
-        formattedUser.uid,
-        formattedUser.email as string
-      );
-
-      if (cResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
-        signOut();
-
-        return;
-      }
-
-      // @ts-ignore
-      setAuthUser((prev) => {
-        return {
-          ...formattedUser,
-          username: newUser?.username as string,
-          dateCreated: newUser?.dateCreated as number,
-          highestScoringGame: newUser?.highestScoringGame,
-        };
-      });
-    } else {
+    if (resultInfo.resultStatus === ApiResultStatus.SUCCESS) {
       // @ts-ignore
       setAuthUser((prev) => ({
         ...formattedUser,
@@ -101,6 +81,36 @@ export default function useFirebaseAuth() {
         dateCreated: user?.dateCreated as number,
         highestScoringGame: user?.highestScoringGame,
       }));
+    } else {
+      // A new user can only be created if a user does not exist.
+      // If the API error response is different from USER_NOT_FOUND,
+      // it could be possible be because of ex. Invalid Request Parameters
+      if (resultInfo.resultCode !== ApiResultCode.USER_NOT_FOUND) {
+        signOut();
+
+        return;
+      } else {
+        const { user: newUser, resultInfo: cResultInfo } = await CREATE_USER(
+          formattedUser.uid,
+          formattedUser.email as string
+        );
+
+        if (cResultInfo.resultCode !== ApiResultCode.REQ_SUCCESS) {
+          signOut();
+
+          return;
+        }
+
+        // @ts-ignore
+        setAuthUser((prev) => {
+          return {
+            ...formattedUser,
+            username: newUser?.username as string,
+            dateCreated: newUser?.dateCreated as number,
+            highestScoringGame: newUser?.highestScoringGame,
+          };
+        });
+      }
     }
 
     setLoading(false);
