@@ -74,7 +74,10 @@ export default function useFirebaseAuth() {
     const formattedUser = formatAuthUser(authState);
 
     // Query user to get username
-    const { user, resultInfo } = await QUERY_USER(formattedUser.uid);
+    const { user, resultInfo } = await QUERY_USER(
+      userIdToken,
+      formattedUser.uid
+    );
 
     if (resultInfo.resultStatus === ApiResultStatus.SUCCESS) {
       // @ts-ignore

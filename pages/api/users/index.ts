@@ -62,16 +62,24 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const query = await GetUser(reqBody.request.body.userId);
+        const isValidIdToken: boolean = await VerifyIdToken(
+          FromBase64(reqBody.request.signature)
+        );
 
-        if (query.user) {
-          const { email, ...userData } = query.user;
-
-          user = userData;
-
-          resInfo = REQ_SUCCESS;
+        if (!isValidIdToken) {
+          resInfo = UNAUTHORIZED_USER;
         } else {
-          resInfo = USER_NOT_FOUND;
+          const query = await GetUser(reqBody.request.body.userId);
+
+          if (query.user) {
+            const { email, ...userData } = query.user;
+
+            user = userData;
+
+            resInfo = REQ_SUCCESS;
+          } else {
+            resInfo = USER_NOT_FOUND;
+          }
         }
       }
     } else if (reqFunction === ApiRequestFunction.USER_CREATE) {

@@ -4,7 +4,7 @@ import { APIGamesResponse } from "../interfaces/api/games.interface";
 import { APIUsersResponse } from "../interfaces/api/users.interface";
 import { ToBase64 } from "./base64";
 
-export const QUERY_USER = async (userId: string) => {
+export const QUERY_USER = async (userIdToken: string, userId: string) => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "POST",
     headers: {
@@ -18,6 +18,7 @@ export const QUERY_USER = async (userId: string) => {
         body: {
           userId,
         },
+        signature: ToBase64(userIdToken),
       },
     }),
   });
