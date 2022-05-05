@@ -95,6 +95,7 @@ export default function useFirebaseAuth() {
         return;
       } else {
         const { user: newUser, resultInfo: cResultInfo } = await CREATE_USER(
+          userIdToken,
           formattedUser.uid,
           formattedUser.email as string
         );

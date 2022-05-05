@@ -30,6 +30,7 @@ export const QUERY_USER = async (userId: string) => {
 };
 
 export const CREATE_USER = async (
+  userIdToken: string,
   userId: string,
   email: string,
   username?: string
@@ -49,6 +50,7 @@ export const CREATE_USER = async (
           email,
           username,
         },
+        signature: ToBase64(userIdToken),
       },
     }),
   });

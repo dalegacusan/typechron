@@ -87,38 +87,46 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const defaultUsername = GenerateUsername();
-        const dateCreated = Date.now();
+        const isValidIdToken: boolean = await VerifyIdToken(
+          FromBase64(reqBody.request.signature)
+        );
 
-        const newUser: User = {
-          id: reqBody.request.body.userId,
-          email: reqBody.request.body.email,
-          username: defaultUsername,
-          dateCreated,
-          highestScoringGame: {
-            gameId: "",
-            round: 0,
-            score: 0,
-            wpm: 0,
-            words: [],
-            dateCreated,
-          },
-        };
-
-        if (reqBody.request.body.username) {
-          newUser.username = reqBody.request.body.username;
-        }
-
-        const query = await CreateUser(newUser);
-
-        if (query.user) {
-          const { email, ...userData } = query.user;
-
-          user = userData;
-
-          resInfo = REQ_SUCCESS;
+        if (!isValidIdToken) {
+          resInfo = UNAUTHORIZED_USER;
         } else {
-          resInfo = FAILED_TO_CREATE_NEW_USER;
+          const defaultUsername = GenerateUsername();
+          const dateCreated = Date.now();
+
+          const newUser: User = {
+            id: reqBody.request.body.userId,
+            email: reqBody.request.body.email,
+            username: defaultUsername,
+            dateCreated,
+            highestScoringGame: {
+              gameId: "",
+              round: 0,
+              score: 0,
+              wpm: 0,
+              words: [],
+              dateCreated,
+            },
+          };
+
+          if (reqBody.request.body.username) {
+            newUser.username = reqBody.request.body.username;
+          }
+
+          const query = await CreateUser(newUser);
+
+          if (query.user) {
+            const { email, ...userData } = query.user;
+
+            user = userData;
+
+            resInfo = REQ_SUCCESS;
+          } else {
+            resInfo = FAILED_TO_CREATE_NEW_USER;
+          }
         }
       }
     } else {
