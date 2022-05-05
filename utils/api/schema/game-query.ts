@@ -5,10 +5,7 @@ import { QueryOrderDirection } from "../enums/query-order-direction.enum";
 export const GAME_QUERY_SCHEMA = z.object({
   request: z.object({
     head: z.object({
-      function: z.enum([
-        ApiRequestFunction.GAME_QUERY,
-        ApiRequestFunction.GAME_CREATE,
-      ]),
+      function: z.enum([ApiRequestFunction.GAME_QUERY]),
     }),
     body: z.object({
       limit: z.number().int(),

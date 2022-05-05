@@ -8,10 +8,7 @@ import {
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
-import {
-  APIGamesRequest,
-  APIGamesResponse,
-} from "../../../interfaces/api/games.interface";
+import { APIGamesResponse } from "../../../interfaces/api/games.interface";
 import { Game } from "../../../interfaces/game.interface";
 import {
   CreateGame,
@@ -33,6 +30,10 @@ import {
   GAME_QUERY_SCHEMA,
   GAME_QUERY_TYPE,
 } from "../../../utils/api/schema/game-query";
+import {
+  GAME_CREATE_SCHEMA,
+  GAME_CREATE_TYPE,
+} from "../../../utils/api/schema/game-create";
 
 export default async function handler(
   req: NextApiRequest,
@@ -98,43 +99,56 @@ export default async function handler(
         resInfo = REQ_SUCCESS;
       }
     } else if (reqFunction === ApiRequestFunction.GAME_CREATE) {
-      const userQuery = await GetUser(reqBody.request.body.userId as string);
+      const reqBody: GAME_CREATE_TYPE = req.body;
+      const gameCreateSchema = GAME_CREATE_SCHEMA;
+      const schemaResult = gameCreateSchema.safeParse(reqBody);
 
-      if (userQuery.user) {
-        const newGame: Game = {
-          userId: reqBody.request.body.userId as string,
-          round: reqBody.request.body.round as number,
-          score: reqBody.request.body.score as number,
-          wpm: reqBody.request.body.wpm as number,
-          words: reqBody.request.body.words as string[],
-          dateCreated: Date.now(),
-        };
+      if (!schemaResult.success) {
+        const tempResInfo = INVALID_REQ_BODY_PARAMS;
+        const paramPath = schemaResult.error.issues[0].path.join(".");
 
-        const gameQuery = await CreateGame(newGame);
+        tempResInfo.resultMsg = `Invalid ${paramPath}.`;
 
-        if (gameQuery.game) {
-          game = gameQuery.game;
+        resInfo = tempResInfo;
+      } else {
+        const userQuery = await GetUser(reqBody.request.body.userId);
 
-          resInfo = REQ_SUCCESS;
+        if (userQuery.user) {
+          const newGame: Game = {
+            userId: reqBody.request.body.userId,
+            round: reqBody.request.body.round,
+            score: reqBody.request.body.score,
+            wpm: reqBody.request.body.wpm,
+            words: reqBody.request.body.words,
+            dateCreated: Date.now(),
+          };
 
-          // Check if new high score
-          if (newGame.score > userQuery.user.highestScoringGame.score) {
-            const { userId, ...filteredNewGameData } = newGame;
+          const gameQuery = await CreateGame(newGame);
 
-            const dataTobeUpdated = {
-              highestScoringGame: {
-                gameId: gameQuery.game.id,
-                ...filteredNewGameData,
-              },
-            };
+          if (gameQuery.game) {
+            game = gameQuery.game;
 
-            await UpdateUser(newGame.userId, dataTobeUpdated);
+            resInfo = REQ_SUCCESS;
+
+            // Check if new high score
+            if (newGame.score > userQuery.user.highestScoringGame.score) {
+              const { userId, ...filteredNewGameData } = newGame;
+
+              const dataTobeUpdated = {
+                highestScoringGame: {
+                  gameId: gameQuery.game.id,
+                  ...filteredNewGameData,
+                },
+              };
+
+              await UpdateUser(newGame.userId, dataTobeUpdated);
+            }
+          } else {
+            resInfo = FAILED_TO_CREATE_NEW_GAME;
           }
         } else {
-          resInfo = FAILED_TO_CREATE_NEW_GAME;
+          resInfo = USER_NOT_FOUND;
         }
-      } else {
-        resInfo = USER_NOT_FOUND;
       }
     } else {
       resInfo = REQ_FUNC_NOT_SUPPORTED;
