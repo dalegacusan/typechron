@@ -23,19 +23,23 @@ import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum
 import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
 import {
   FAILED_TO_CREATE_NEW_GAME,
+  INVALID_REQ_BODY_PARAMS,
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
+import {
+  GAME_QUERY_SCHEMA,
+  GAME_QUERY_TYPE,
+} from "../../../utils/api/schema/game-query";
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   const constraints = []; // @ref https://stackoverflow.com/a/69036032/12278028
-  const reqBody: APIGamesRequest = req.body;
-  const reqFunction: ApiRequestFunction = reqBody.request.head.function;
+  const reqFunction: ApiRequestFunction = req.body?.request?.head?.function;
   let resBody: APIGamesResponse = {} as APIGamesResponse;
   let resInfo: ApiResultInfo = {} as ApiResultInfo;
 
@@ -45,41 +49,54 @@ export default async function handler(
       lastKey: number | undefined;
 
     if (reqFunction === ApiRequestFunction.GAME_QUERY) {
-      if (reqBody.request.body.userId) {
-        constraints.push(where("userId", "==", reqBody.request.body.userId));
-      }
+      const reqBody: GAME_QUERY_TYPE = req.body;
+      const gameQuerySchema = GAME_QUERY_SCHEMA;
+      const schemaResult = gameQuerySchema.safeParse(reqBody);
 
-      constraints.push(
-        orderBy(
-          reqBody.request.body.orderBy.fieldPath,
-          reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
-        )
-      );
+      if (!schemaResult.success) {
+        const tempResInfo = INVALID_REQ_BODY_PARAMS;
+        const paramPath = schemaResult.error.issues[0].path.join(".");
 
-      // Handle 2 similar "orderBy" to field "dateCreated"
-      // For My Account page, must use only "dateCreated" field path
-      // For Leaderboards page, must use both "score" and "dateCreated" field paths
-      if (reqBody.request.body.orderBy.fieldPath !== "dateCreated") {
+        tempResInfo.resultMsg = `Invalid ${paramPath}.`;
+
+        resInfo = tempResInfo;
+      } else {
+        if (reqBody.request.body.userId) {
+          constraints.push(where("userId", "==", reqBody.request.body.userId));
+        }
+
         constraints.push(
           orderBy(
-            "dateCreated",
+            reqBody.request.body.orderBy.fieldPath,
             reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
           )
         );
+
+        // Handle 2 similar "orderBy" to field "dateCreated"
+        // For My Account page, must use only "dateCreated" field path
+        // For Leaderboards page, must use both "score" and "dateCreated" field paths
+        if (reqBody.request.body.orderBy.fieldPath !== "dateCreated") {
+          constraints.push(
+            orderBy(
+              "dateCreated",
+              reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
+            )
+          );
+        }
+
+        if (reqBody.request.body.lastKey) {
+          constraints.push(startAfter(reqBody.request.body.lastKey));
+        }
+
+        constraints.push(limit(reqBody.request.body.limit));
+
+        const query = await GetGames(constraints);
+
+        games = query.games;
+        lastKey = query.lastKey;
+
+        resInfo = REQ_SUCCESS;
       }
-
-      if (reqBody.request.body.lastKey) {
-        constraints.push(startAfter(reqBody.request.body.lastKey));
-      }
-
-      constraints.push(limit(reqBody.request.body.limit));
-
-      const query = await GetGames(constraints);
-
-      games = query.games;
-      lastKey = query.lastKey;
-
-      resInfo = REQ_SUCCESS;
     } else if (reqFunction === ApiRequestFunction.GAME_CREATE) {
       const userQuery = await GetUser(reqBody.request.body.userId as string);
 

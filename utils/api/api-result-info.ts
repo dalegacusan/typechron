@@ -43,3 +43,9 @@ export const FAILED_TO_CREATE_NEW_GAME: ApiResultInfo = {
   resultCode: ApiResultCode.FAILED_TO_CREATE_NEW_GAME,
   resultMsg: "Failed to create new game.",
 };
+
+export const INVALID_REQ_BODY_PARAMS: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.INVALID_REQ_PARAMS,
+  resultMsg: "Invalid request parameters", // will get overwritten
+};
