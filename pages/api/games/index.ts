@@ -125,50 +125,58 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const userQuery = await GetUser(reqBody.request.body.userId);
+        const isValidIdToken: boolean = await VerifyIdToken(
+          FromBase64(reqBody.request.signature)
+        );
 
-        if (userQuery.user) {
-          const newGame: Game = {
-            userId: reqBody.request.body.userId,
-            round: reqBody.request.body.round,
-            score: reqBody.request.body.score,
-            wpm: reqBody.request.body.wpm,
-            words: reqBody.request.body.words,
-            dateCreated: Date.now(),
-          };
+        if (!isValidIdToken) {
+          resInfo = UNAUTHORIZED_USER;
+        } else {
+          const userQuery = await GetUser(reqBody.request.body.userId);
 
-          const gameQuery = await CreateGame(newGame);
+          if (userQuery.user) {
+            const newGame: Game = {
+              userId: reqBody.request.body.userId,
+              round: reqBody.request.body.round,
+              score: reqBody.request.body.score,
+              wpm: reqBody.request.body.wpm,
+              words: reqBody.request.body.words,
+              dateCreated: Date.now(),
+            };
 
-          if (gameQuery.game) {
-            game = gameQuery.game;
+            const gameQuery = await CreateGame(newGame);
 
-            resInfo = REQ_SUCCESS;
+            if (gameQuery.game) {
+              game = gameQuery.game;
 
-            // Check if new high score
-            if (newGame.score > userQuery.user.highestScoringGame.score) {
-              const { userId, ...filteredNewGameData } = newGame;
+              resInfo = REQ_SUCCESS;
 
-              const dataTobeUpdated = {
-                highestScoringGame: {
-                  gameId: gameQuery.game.id,
-                  ...filteredNewGameData,
-                },
-              };
+              // Check if new high score
+              if (newGame.score > userQuery.user.highestScoringGame.score) {
+                const { userId, ...filteredNewGameData } = newGame;
 
-              const updatedUser = await UpdateUser(
-                newGame.userId,
-                dataTobeUpdated
-              );
+                const dataTobeUpdated = {
+                  highestScoringGame: {
+                    gameId: gameQuery.game.id,
+                    ...filteredNewGameData,
+                  },
+                };
 
-              if (!updatedUser.user) {
-                resInfo = FAILED_TO_UPDATE_USER;
+                const updatedUser = await UpdateUser(
+                  newGame.userId,
+                  dataTobeUpdated
+                );
+
+                if (!updatedUser.user) {
+                  resInfo = FAILED_TO_UPDATE_USER;
+                }
               }
+            } else {
+              resInfo = FAILED_TO_CREATE_NEW_GAME;
             }
           } else {
-            resInfo = FAILED_TO_CREATE_NEW_GAME;
+            resInfo = USER_NOT_FOUND;
           }
-        } else {
-          resInfo = USER_NOT_FOUND;
         }
       }
     } else {

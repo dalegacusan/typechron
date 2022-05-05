@@ -116,6 +116,7 @@ const Home: NextPage = () => {
     setIsSavingRecord(true);
 
     const { resultInfo } = await CREATE_GAME(
+      authUser?.idToken as string,
       authUser?.uid as string,
       doneWords.length - 1,
       userScore,

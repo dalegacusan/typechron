@@ -125,6 +125,7 @@ export const QUERY_GAMES = async (
 };
 
 export const CREATE_GAME = async (
+  idToken: string,
   userId: string,
   round: number,
   score: number,
@@ -148,6 +149,7 @@ export const CREATE_GAME = async (
           wpm,
           words,
         },
+        signature: ToBase64(idToken),
       },
     }),
   });

@@ -53,6 +53,7 @@ const AccountGameHistory = (props: AccountGameProps) => {
 
       const getUserGames = async () =>
         QUERY_GAMES(
+          authUser.idToken as string,
           10,
           { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },
           authUser.uid,

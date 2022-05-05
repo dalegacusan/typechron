@@ -13,6 +13,7 @@ export const GAME_CREATE_SCHEMA = z.object({
       wpm: z.number(),
       words: z.array(z.string().nonempty()).nonempty(),
     }),
+    signature: z.string().nonempty(),
   }),
 });
 

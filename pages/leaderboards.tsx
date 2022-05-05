@@ -27,7 +27,7 @@ const Leaderboards = () => {
 
   useEffect(() => {
     if (!loading && authUser) {
-      QUERY_GAMES(10, {
+      QUERY_GAMES(authUser.idToken as string, 10, {
         direction: QueryOrderDirection.DESC,
         fieldPath: "score",
       })
