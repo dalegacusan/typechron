@@ -38,9 +38,9 @@ import {
   GAME_CREATE_TYPE,
 } from "../../../utils/api/schema/game-create";
 import {
-  GAME_QUERY_LEADERBOARDS_SCHEMA,
-  GAME_QUERY_LEADERBOARDS_TYPE,
-} from "../../../utils/api/schema/game-query-leaderboards";
+  GAME_QUERY_LEADERBOARD_SCHEMA,
+  GAME_QUERY_LEADERBOARD_TYPE,
+} from "../../../utils/api/schema/game-query-leaderboard";
 import { withAuth } from "../../../utils/api/middlewares/withAuth.middleware";
 
 const handler = async (
@@ -96,10 +96,10 @@ const handler = async (
           resInfo = REQ_SUCCESS;
         }
       }
-    } else if (reqFunction === ApiRequestFunction.GAME_QUERY_LEADERBOARDS) {
-      const reqBody: GAME_QUERY_LEADERBOARDS_TYPE = req.body;
-      const gameQueryLeaderboardsSchema = GAME_QUERY_LEADERBOARDS_SCHEMA;
-      const schemaResult = gameQueryLeaderboardsSchema.safeParse(reqBody);
+    } else if (reqFunction === ApiRequestFunction.GAME_QUERY_LEADERBOARD) {
+      const reqBody: GAME_QUERY_LEADERBOARD_TYPE = req.body;
+      const gameQueryLeaderboardSchema = GAME_QUERY_LEADERBOARD_SCHEMA;
+      const schemaResult = gameQueryLeaderboardSchema.safeParse(reqBody);
 
       if (!schemaResult.success) {
         const tempResInfo = INVALID_REQ_BODY_PARAMS;

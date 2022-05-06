@@ -41,7 +41,7 @@ const SignIn = () => {
       </Title>
 
       <Text color="dimmed" size="sm" align="center" mt={5}>
-        Sign in to join the leaderboards.
+        Sign in to join the leaderboard.
       </Text>
 
       <Center>

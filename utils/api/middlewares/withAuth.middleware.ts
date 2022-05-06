@@ -28,7 +28,7 @@ export function withAuth(handler: any) {
     };
 
     if (reqFunction) {
-      if (reqFunction !== ApiRequestFunction.GAME_QUERY_LEADERBOARDS) {
+      if (reqFunction !== ApiRequestFunction.GAME_QUERY_LEADERBOARD) {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
           resBody.response.body.resultInfo = AUTHORIZATION_HEADER_NOT_FOUND;

@@ -131,7 +131,7 @@ const Home: NextPage = () => {
         id: "success-create-game",
         autoClose: 5000,
         title: "Successfully saved your record!",
-        message: "Did you make it to the leaderboards?",
+        message: "Did you make it to the leaderboard?",
         color: "green",
         icon: <Check size={16} />,
       });

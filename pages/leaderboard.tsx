@@ -10,7 +10,7 @@ import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
 import GameRecordModalContent from "../components/modal-content/game-record-modal-content";
 import GameRecord from "../components/game-record";
 
-const Leaderboards = () => {
+const Leaderboard = () => {
   const modals = useModals();
   const [games, setGames] = useState<Game[]>();
 
@@ -61,7 +61,7 @@ const Leaderboards = () => {
 
   return (
     <Box mb={70}>
-      <Title order={2}>Leaderboards</Title>
+      <Title order={2}>Leaderboard</Title>
       <Text size="sm" color="dimmed" mt={4}>
         Click on a record for more information
       </Text>
@@ -93,4 +93,4 @@ const Leaderboards = () => {
   );
 };
 
-export default Leaderboards;
+export default Leaderboard;

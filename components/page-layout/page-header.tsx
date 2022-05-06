@@ -108,8 +108,8 @@ export function PageHeader() {
       </a>
     </>,
     <>
-      <a className={classes.link} onClick={() => router.push("/leaderboards")}>
-        Leaderboards
+      <a className={classes.link} onClick={() => router.push("/leaderboard")}>
+        Leaderboard
       </a>
     </>,
     <>

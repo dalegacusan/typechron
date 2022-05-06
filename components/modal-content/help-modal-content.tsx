@@ -42,11 +42,11 @@ const HelpModalContent = () => {
       <Space h="md" />
       <Space h="md" />
 
-      <Title order={4}>How do I join the leaderboards?</Title>
+      <Title order={4}>How do I join the leaderboard?</Title>
       <Space h="sm" />
 
       <Text size="sm">
-        You can join the leaderboards when you are{" "}
+        You can join the leaderboard when you are{" "}
         <Link href="/login" passHref>
           <Text
             variant="link"

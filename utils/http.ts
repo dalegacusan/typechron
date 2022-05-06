@@ -147,7 +147,7 @@ export const QUERY_GAMES_LEADERBOARD = async (
     body: JSON.stringify({
       request: {
         head: {
-          function: ApiRequestFunction.GAME_QUERY_LEADERBOARDS,
+          function: ApiRequestFunction.GAME_QUERY_LEADERBOARD,
         },
         body: {
           limit,
