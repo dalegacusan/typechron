@@ -3,10 +3,11 @@
 import { NextApiResponse } from "next";
 import { NextApiRequestWithIdToken } from "../types/next-api-request-with-id-token.type";
 import { VerifyIdToken } from "../../../config/firebase-admin";
-import { FromBase64 } from "../../base64";
+import { FromBase64, IsValidBase64String } from "../../base64";
 import {
   AUTHORIZATION_HEADER_NOT_FOUND,
   BEARER_TOKEN_NOT_FOUND,
+  INVALID_BASE64_STRING,
   REQ_FUNC_NOT_SUPPORTED,
   UNAUTHENTICATED_USER,
 } from "../api-result-info";
@@ -35,7 +36,7 @@ export function withAuth(handler: any) {
           return res.status(401).json(resBody);
         }
 
-        const token = authHeader.split(" ")[1];
+        const token: string = authHeader.split(" ")[1];
         if (!token) {
           resBody.response.body.resultInfo = BEARER_TOKEN_NOT_FOUND;
 
@@ -43,6 +44,14 @@ export function withAuth(handler: any) {
         }
 
         try {
+          const isValidBase64Token: boolean = IsValidBase64String(token);
+
+          if (!isValidBase64Token) {
+            resBody.response.body.resultInfo = INVALID_BASE64_STRING;
+
+            return res.status(401).json(resBody);
+          }
+
           const decodedToken = await VerifyIdToken(FromBase64(token));
 
           if (!decodedToken || !decodedToken.uid) {

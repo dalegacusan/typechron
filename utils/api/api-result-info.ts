@@ -46,6 +46,12 @@ export const BEARER_TOKEN_NOT_FOUND: ApiResultInfo = {
     "Unauthorized: Authentication failed because of missing Bearer token.",
 };
 
+export const INVALID_BASE64_STRING: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.INVALID_BASE64_STRING,
+  resultMsg: "Invalid Base64 String.",
+};
+
 export const USER_NOT_FOUND: ApiResultInfo = {
   resultStatus: ApiResultStatus.FAILURE,
   resultCode: ApiResultCode.USER_NOT_FOUND,
