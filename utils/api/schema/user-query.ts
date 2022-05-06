@@ -9,7 +9,6 @@ export const USER_QUERY_SCHEMA = z.object({
     body: z.object({
       userId: z.string().nonempty(),
     }),
-    signature: z.string().nonempty(),
   }),
 });
 

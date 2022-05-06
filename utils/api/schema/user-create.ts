@@ -11,7 +11,6 @@ export const USER_CREATE_SCHEMA = z.object({
       email: z.string().nonempty().email(),
       username: z.string().max(8).optional(),
     }),
-    signature: z.string().nonempty(),
   }),
 });
 

@@ -8,15 +8,9 @@ if (!admin.apps.length) {
 }
 
 export const VerifyIdToken = async (token: string) => {
-  let isValidToken;
-
   try {
-    await admin.auth().verifyIdToken(token);
-
-    isValidToken = true;
+    return admin.auth().verifyIdToken(token);
   } catch (err) {
-    isValidToken = false;
+    return null;
   }
-
-  return isValidToken;
 };

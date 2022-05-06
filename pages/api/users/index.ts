@@ -1,8 +1,8 @@
 import { DocumentData } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
+import { APIUsersResponse } from "../../../utils/api/interfaces/users.interface";
 import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
-import { APIUsersResponse } from "../../../interfaces/api/users.interface";
 import { User } from "../../../interfaces/user.interface";
 import {
   CreateUser,
@@ -18,11 +18,11 @@ import {
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
-  UNAUTHORIZED_USER,
+  UNAUTHENTICATED_USER,
   USER_NOT_ALLOWED_TO_CHANGE_USERNAME,
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
-import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
+import { ApiResultInfo } from "../../../utils/api/interfaces/api-result-info.interface";
 import {
   USER_QUERY_SCHEMA,
   USER_QUERY_TYPE,
@@ -35,13 +35,9 @@ import {
   USER_UPDATE_SCHEMA,
   USER_UPDATE_TYPE,
 } from "../../../utils/api/schema/user-update";
-import { VerifyIdToken } from "../../../config/firebase-admin";
-import { FromBase64 } from "../../../utils/base64";
+import { withAuth } from "../../../utils/api/middlewares/withAuth.middleware";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const reqFunction: ApiRequestFunction = req.body?.request?.head?.function;
   let resBody: APIUsersResponse = {} as APIUsersResponse;
   let resInfo: ApiResultInfo = {} as ApiResultInfo;
@@ -62,12 +58,8 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const isValidIdToken: boolean = await VerifyIdToken(
-          FromBase64(reqBody.request.signature)
-        );
-
-        if (!isValidIdToken) {
-          resInfo = UNAUTHORIZED_USER;
+        if (reqBody.request.body.userId !== req.uid) {
+          resInfo = UNAUTHENTICATED_USER;
         } else {
           const query = await GetUser(reqBody.request.body.userId);
 
@@ -95,12 +87,8 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const isValidIdToken: boolean = await VerifyIdToken(
-          FromBase64(reqBody.request.signature)
-        );
-
-        if (!isValidIdToken) {
-          resInfo = UNAUTHORIZED_USER;
+        if (reqBody.request.body.userId !== req.uid) {
+          resInfo = UNAUTHENTICATED_USER;
         } else {
           const defaultUsername = GenerateUsername();
           const dateCreated = Date.now();
@@ -166,12 +154,8 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const isValidIdToken: boolean = await VerifyIdToken(
-          FromBase64(reqBody.request.signature)
-        );
-
-        if (!isValidIdToken) {
-          resInfo = UNAUTHORIZED_USER;
+        if (reqBody.request.body.userId !== req.uid) {
+          resInfo = UNAUTHENTICATED_USER;
         } else {
           const query = await GetUser(reqBody.request.body.userId);
 
@@ -234,5 +218,9 @@ export default async function handler(
 
   const resultCode = resBody.response.body.resultInfo.resultStatus;
 
-  res.status(resultCode === ApiResultStatus.SUCCESS ? 200 : 400).json(resBody);
-}
+  return res
+    .status(resultCode === ApiResultStatus.SUCCESS ? 200 : 400)
+    .json(resBody);
+};
+
+export default withAuth(handler);

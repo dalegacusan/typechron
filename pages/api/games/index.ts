@@ -8,7 +8,7 @@ import {
 } from "firebase/firestore";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
-import { APIGamesResponse } from "../../../interfaces/api/games.interface";
+import { APIGamesResponse } from "../../../utils/api/interfaces/games.interface";
 import { Game } from "../../../interfaces/game.interface";
 import {
   CreateGame,
@@ -17,7 +17,7 @@ import {
   UpdateUser,
 } from "../../../utils/firebase-functions";
 import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
-import { ApiResultInfo } from "../../../interfaces/api/api-result-info.interface";
+import { ApiResultInfo } from "../../../utils/api/interfaces/api-result-info.interface";
 import {
   FAILED_TO_CREATE_NEW_GAME,
   FAILED_TO_UPDATE_USER,
@@ -25,7 +25,7 @@ import {
   REQ_FUNC_NOT_SUPPORTED,
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
-  UNAUTHORIZED_USER,
+  UNAUTHENTICATED_USER,
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
 import {
@@ -40,13 +40,9 @@ import {
   GAME_QUERY_LEADERBOARDS_SCHEMA,
   GAME_QUERY_LEADERBOARDS_TYPE,
 } from "../../../utils/api/schema/game-query-leaderboards";
-import { VerifyIdToken } from "../../../config/firebase-admin";
-import { FromBase64 } from "../../../utils/base64";
+import { withAuth } from "../../../utils/api/middlewares/withAuth.middleware";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const constraints = []; // @ref https://stackoverflow.com/a/69036032/12278028
   const reqFunction: ApiRequestFunction = req.body?.request?.head?.function;
   let resBody: APIGamesResponse = {} as APIGamesResponse;
@@ -70,12 +66,8 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const isValidIdToken: boolean = await VerifyIdToken(
-          FromBase64(reqBody.request.signature)
-        );
-
-        if (!isValidIdToken) {
-          resInfo = UNAUTHORIZED_USER;
+        if (reqBody.request.body.userId !== req.uid) {
+          resInfo = UNAUTHENTICATED_USER;
         } else {
           constraints.push(where("userId", "==", reqBody.request.body.userId));
 
@@ -141,12 +133,8 @@ export default async function handler(
 
         resInfo = tempResInfo;
       } else {
-        const isValidIdToken: boolean = await VerifyIdToken(
-          FromBase64(reqBody.request.signature)
-        );
-
-        if (!isValidIdToken) {
-          resInfo = UNAUTHORIZED_USER;
+        if (reqBody.request.body.userId !== req.uid) {
+          resInfo = UNAUTHENTICATED_USER;
         } else {
           const userQuery = await GetUser(reqBody.request.body.userId);
 
@@ -227,5 +215,9 @@ export default async function handler(
 
   const resultCode = resBody.response.body.resultInfo.resultStatus;
 
-  res.status(resultCode === ApiResultStatus.SUCCESS ? 200 : 400).json(resBody);
-}
+  return res
+    .status(resultCode === ApiResultStatus.SUCCESS ? 200 : 400)
+    .json(resBody);
+};
+
+export default withAuth(handler);

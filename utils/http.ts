@@ -1,13 +1,14 @@
 import { ApiRequestFunction } from "./api/enums/api-request-function.enum";
 import { QueryOrderDirection } from "./api/enums/query-order-direction.enum";
-import { APIGamesResponse } from "../interfaces/api/games.interface";
-import { APIUsersResponse } from "../interfaces/api/users.interface";
+import { APIGamesResponse } from "./api/interfaces/games.interface";
+import { APIUsersResponse } from "./api/interfaces/users.interface";
 import { ToBase64 } from "./base64";
 
 export const QUERY_USER = async (userIdToken: string, userId: string) => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${ToBase64(userIdToken)}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -18,7 +19,6 @@ export const QUERY_USER = async (userIdToken: string, userId: string) => {
         body: {
           userId,
         },
-        signature: ToBase64(userIdToken),
       },
     }),
   });
@@ -39,6 +39,7 @@ export const CREATE_USER = async (
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${ToBase64(userIdToken)}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -51,7 +52,6 @@ export const CREATE_USER = async (
           email,
           username,
         },
-        signature: ToBase64(userIdToken),
       },
     }),
   });
@@ -71,6 +71,7 @@ export const UPDATE_USER = async (
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
     method: "PUT",
     headers: {
+      Authorization: `Bearer ${ToBase64(userIdToken)}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -82,7 +83,6 @@ export const UPDATE_USER = async (
           userId,
           username,
         },
-        signature: ToBase64(userIdToken),
       },
     }),
   });
@@ -106,6 +106,7 @@ export const QUERY_GAMES = async (
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${ToBase64(userIdToken)}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -119,7 +120,6 @@ export const QUERY_GAMES = async (
           userId,
           lastKey,
         },
-        signature: ToBase64(userIdToken),
       },
     }),
   });
@@ -175,6 +175,7 @@ export const CREATE_GAME = async (
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
     method: "POST",
     headers: {
+      Authorization: `Bearer ${ToBase64(userIdToken)}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -189,7 +190,6 @@ export const CREATE_GAME = async (
           wpm,
           words,
         },
-        signature: ToBase64(userIdToken),
       },
     }),
   });

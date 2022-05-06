@@ -10,7 +10,6 @@ export const USER_UPDATE_SCHEMA = z.object({
       userId: z.string().nonempty(),
       username: z.string().nonempty().min(1).max(8),
     }),
-    signature: z.string().nonempty(),
   }),
 });
 
