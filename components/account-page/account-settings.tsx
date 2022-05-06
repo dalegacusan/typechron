@@ -6,6 +6,7 @@ import { useAuth } from "../../ contexts/authUserContext";
 import { ApiResultStatus } from "../../utils/api/enums/api-result-status.enum";
 import { UPDATE_USER } from "../../utils/http";
 import { AddOneDayFromUnixTimestamp } from "../../utils/time";
+import { usernameMaxLength, usernameMinLength } from "../../config/app";
 
 const AccountSettings = () => {
   const { loading, authUser } = useAuth();
@@ -24,8 +25,10 @@ const AccountSettings = () => {
       setUsernameInputError("Please enter a username.");
 
       return;
-    } else if (trimmedUsername.length > 8) {
-      setUsernameInputError("Username must have 1 - 8 characters");
+    } else if (trimmedUsername.length > usernameMaxLength) {
+      setUsernameInputError(
+        `Username must have ${usernameMinLength} - ${usernameMaxLength} characters.`
+      );
 
       return;
     }
@@ -63,9 +66,11 @@ const AccountSettings = () => {
   };
 
   useEffect(() => {
-    // Show input error when username length exceeds 8 characters
-    if (username.trim().length > 8) {
-      setUsernameInputError("Username must have 1 - 8 characters");
+    // Show input error when username length exceeds usernameMaxLength characters
+    if (username.trim().length > usernameMaxLength) {
+      setUsernameInputError(
+        `Username must have ${usernameMinLength} - ${usernameMaxLength} characters.`
+      );
     } else {
       setUsernameInputError("");
     }
@@ -118,7 +123,9 @@ const AccountSettings = () => {
           leftIcon={<DeviceFloppy size={14} />}
           onClick={updateUsername}
           loading={isUpdatingUser}
-          disabled={!username || isUpdateDisabled}
+          disabled={
+            !username || usernameInputError.length > 0 || isUpdateDisabled
+          }
         >
           {isUpdatingUser ? "Saving" : "Save"}
         </Button>

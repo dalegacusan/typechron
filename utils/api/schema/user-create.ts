@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { usernameMaxLength } from "../../../config/app";
 import { ApiRequestFunction } from "../enums/api-request-function.enum";
 
 export const USER_CREATE_SCHEMA = z.object({
@@ -9,7 +10,7 @@ export const USER_CREATE_SCHEMA = z.object({
     body: z.object({
       userId: z.string().nonempty(),
       email: z.string().nonempty().email(),
-      username: z.string().max(8).optional(),
+      username: z.string().nonempty().max(usernameMaxLength).optional(),
     }),
   }),
 });

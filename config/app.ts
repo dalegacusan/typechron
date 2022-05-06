@@ -1,6 +1,9 @@
 export const initialGameTimeInMs = 10000;
 export const initialDoneWords = ["start"];
 
+export const usernameMinLength = 1;
+export const usernameMaxLength = 12;
+
 export const black = "#101113";
 export const green = "#82c91e";
 export const red = "#fa5252";

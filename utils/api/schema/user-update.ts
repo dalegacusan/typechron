@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { usernameMaxLength } from "../../../config/app";
 import { ApiRequestFunction } from "../enums/api-request-function.enum";
 
 export const USER_UPDATE_SCHEMA = z.object({
@@ -8,7 +9,7 @@ export const USER_UPDATE_SCHEMA = z.object({
     }),
     body: z.object({
       userId: z.string().nonempty(),
-      username: z.string().nonempty().min(1).max(8),
+      username: z.string().nonempty().max(usernameMaxLength),
     }),
   }),
 });
