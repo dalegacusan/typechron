@@ -13,6 +13,7 @@ import {
 import { firebaseDb } from "../config/firebase-app";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
+import { DatabaseCollection } from "./api/enums/database-collection.enum";
 
 // Users
 // ================
@@ -21,7 +22,7 @@ export const GetUser = async (userId: string) => {
   let user: DocumentData | null;
 
   try {
-    const userRef = doc(firebaseDb, "users", userId);
+    const userRef = doc(firebaseDb, DatabaseCollection.USERS, userId);
     const userSnap = await getDoc(userRef);
 
     if (!userSnap.exists()) {
@@ -45,7 +46,7 @@ export const GetUserByUsername = async (username: string) => {
   let user: DocumentData | null = null;
 
   try {
-    const usersRef = collection(firebaseDb, "users");
+    const usersRef = collection(firebaseDb, DatabaseCollection.USERS);
     const q = query(
       usersRef,
       where("lowercaseUsername", "==", username.toLowerCase())
@@ -68,7 +69,7 @@ export const CreateUser = async (user: User) => {
   let newUser: User | null = user;
 
   try {
-    await setDoc(doc(firebaseDb, "users", user.id), user);
+    await setDoc(doc(firebaseDb, DatabaseCollection.USERS, user.id), user);
   } catch (err) {
     newUser = null;
   }
@@ -82,7 +83,7 @@ export const UpdateUser = async (userId: string, dataToBeUpdated: any) => {
   let updatedUser = null;
 
   try {
-    const usersRef = doc(firebaseDb, "users", userId);
+    const usersRef = doc(firebaseDb, DatabaseCollection.USERS, userId);
     await updateDoc(usersRef, dataToBeUpdated);
 
     updatedUser = { id: userId };
@@ -99,7 +100,7 @@ export const UpdateUser = async (userId: string, dataToBeUpdated: any) => {
 // ================
 
 export const GetGames = async (constraints: Array<any>) => {
-  const gamesRef = collection(firebaseDb, "games");
+  const gamesRef = collection(firebaseDb, DatabaseCollection.GAMES);
   const q = query(gamesRef, ...constraints);
   const gamesSnap = await getDocs(q);
 
@@ -138,7 +139,10 @@ export const CreateGame = async (game: Game) => {
   let newGame: DocumentData | null = null;
 
   try {
-    const gameDoc = await addDoc(collection(firebaseDb, "games"), game);
+    const gameDoc = await addDoc(
+      collection(firebaseDb, DatabaseCollection.GAMES),
+      game
+    );
 
     newGame = {
       id: gameDoc.id,
