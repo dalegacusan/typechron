@@ -8,6 +8,7 @@ import { User } from "../../../interfaces/user.interface";
 import {
   CreateUser,
   GetUser,
+  GetUserByUsername,
   UpdateUser,
 } from "../../../utils/firebase-functions";
 import { AddOneDayFromUnixTimestamp } from "../../../utils/time";
@@ -20,6 +21,7 @@ import {
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
   UNAUTHENTICATED_USER,
+  USERNAME_EXISTS,
   USER_NOT_ALLOWED_TO_CHANGE_USERNAME,
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
@@ -68,7 +70,7 @@ const handler = async (
           const query = await GetUser(reqBody.request.body.userId);
 
           if (query.user) {
-            const { email, ...userData } = query.user;
+            const { email, lowercaseUsername, ...userData } = query.user;
 
             user = userData;
 
@@ -101,6 +103,7 @@ const handler = async (
             id: reqBody.request.body.userId,
             email: reqBody.request.body.email,
             username: defaultUsername,
+            lowercaseUsername: defaultUsername.toLowerCase(),
             dateCreated,
             highestScoringGame: {
               gameId: "",
@@ -114,12 +117,14 @@ const handler = async (
 
           if (reqBody.request.body.username) {
             newUser.username = reqBody.request.body.username;
+            newUser.lowercaseUsername =
+              reqBody.request.body.username.toLowerCase();
           }
 
           const query = await CreateUser(newUser);
 
           if (query.user) {
-            const { email, ...userData } = query.user;
+            const { email, lowercaseUsername, ...userData } = query.user;
 
             user = userData;
 
@@ -161,35 +166,43 @@ const handler = async (
         if (reqBody.request.body.userId !== req.uid) {
           resInfo = UNAUTHENTICATED_USER;
         } else {
-          const query = await GetUser(reqBody.request.body.userId);
+          const userQuery = await GetUser(reqBody.request.body.userId);
 
-          if (query.user) {
-            // Check if one day has passed from account creation date
-            const oneDayFromCreation = AddOneDayFromUnixTimestamp(
-              query.user.dateCreated
-            );
-            const isOneDayPassed = Date.now() > oneDayFromCreation;
-
-            if (!isOneDayPassed) {
-              resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
-            } else {
-              const dataTobeUpdated = {
-                username: reqBody.request.body.username,
-              };
-
-              const updatedUser = await UpdateUser(
-                reqBody.request.body.userId,
-                dataTobeUpdated
-              );
-
-              if (updatedUser.user) {
-                resInfo = REQ_SUCCESS;
-              } else {
-                resInfo = FAILED_TO_UPDATE_USER;
-              }
-            }
-          } else {
+          if (!userQuery.user) {
             resInfo = USER_NOT_FOUND;
+          } else {
+            const usernameQuery = await GetUserByUsername(
+              reqBody.request.body.username
+            );
+
+            if (!usernameQuery.user) {
+              // Check if one day has passed from account creation date
+              const oneDayFromCreation = AddOneDayFromUnixTimestamp(
+                userQuery.user.dateCreated
+              );
+              const isOneDayPassed = Date.now() > oneDayFromCreation;
+
+              if (!isOneDayPassed) {
+                resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
+              } else {
+                const dataTobeUpdated = {
+                  username: reqBody.request.body.username,
+                };
+
+                const updatedUser = await UpdateUser(
+                  reqBody.request.body.userId,
+                  dataTobeUpdated
+                );
+
+                if (updatedUser.user) {
+                  resInfo = REQ_SUCCESS;
+                } else {
+                  resInfo = FAILED_TO_UPDATE_USER;
+                }
+              }
+            } else {
+              resInfo = USERNAME_EXISTS;
+            }
           }
         }
       }

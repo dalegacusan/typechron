@@ -64,6 +64,12 @@ export const USER_NOT_ALLOWED_TO_CHANGE_USERNAME: ApiResultInfo = {
   resultMsg: "User is not allowed to change their username.",
 };
 
+export const USERNAME_EXISTS: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.USERNAME_EXISTS,
+  resultMsg: "Username is taken.",
+};
+
 export const FAILED_TO_CREATE_NEW_USER: ApiResultInfo = {
   resultStatus: ApiResultStatus.FAILURE,
   resultCode: ApiResultCode.FAILED_TO_CREATE_NEW_USER,

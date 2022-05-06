@@ -8,6 +8,7 @@ import {
   query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { Game } from "../interfaces/game.interface";
@@ -30,6 +31,30 @@ export const GetUser = async (userId: string) => {
     }
 
     user = userSnap.data();
+  } catch (err) {
+    user = null;
+  }
+
+  return {
+    user,
+  };
+};
+
+// @ref https://stackoverflow.com/a/69765347/12278028
+export const GetUserByUsername = async (username: string) => {
+  let user: DocumentData | null = null;
+
+  try {
+    const usersRef = collection(firebaseDb, "users");
+    const q = query(
+      usersRef,
+      where("lowercaseUsername", "==", username.toLowerCase())
+    );
+    const usersSnap = await getDocs(q);
+
+    if (usersSnap.docs.length > 0) {
+      user = usersSnap.docs[0].data();
+    }
   } catch (err) {
     user = null;
   }
