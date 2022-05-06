@@ -1,5 +1,6 @@
 import { DocumentData } from "firebase/firestore";
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
+import type { NextApiRequestWithIdToken } from "../../../utils/api/types/next-api-request-with-id-token.type";
 import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
 import { APIUsersResponse } from "../../../utils/api/interfaces/users.interface";
 import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
@@ -37,7 +38,10 @@ import {
 } from "../../../utils/api/schema/user-update";
 import { withAuth } from "../../../utils/api/middlewares/withAuth.middleware";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (
+  req: NextApiRequestWithIdToken,
+  res: NextApiResponse
+) => {
   const reqFunction: ApiRequestFunction = req.body?.request?.head?.function;
   let resBody: APIUsersResponse = {} as APIUsersResponse;
   let resInfo: ApiResultInfo = {} as ApiResultInfo;

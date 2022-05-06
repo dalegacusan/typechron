@@ -6,7 +6,8 @@ import {
   startAfter,
   where,
 } from "firebase/firestore";
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiResponse } from "next";
+import type { NextApiRequestWithIdToken } from "../../../utils/api/types/next-api-request-with-id-token.type";
 import { ApiRequestFunction } from "../../../utils/api/enums/api-request-function.enum";
 import { APIGamesResponse } from "../../../utils/api/interfaces/games.interface";
 import { Game } from "../../../interfaces/game.interface";
@@ -42,7 +43,10 @@ import {
 } from "../../../utils/api/schema/game-query-leaderboards";
 import { withAuth } from "../../../utils/api/middlewares/withAuth.middleware";
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (
+  req: NextApiRequestWithIdToken,
+  res: NextApiResponse
+) => {
   const constraints = []; // @ref https://stackoverflow.com/a/69036032/12278028
   const reqFunction: ApiRequestFunction = req.body?.request?.head?.function;
   let resBody: APIGamesResponse = {} as APIGamesResponse;

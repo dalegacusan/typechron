@@ -1,6 +1,6 @@
-import { ApiRequestFunction } from "../../utils/api/enums/api-request-function.enum";
-import { DocumentData } from "firebase/firestore";
+import { ApiRequestFunction } from "../enums/api-request-function.enum";
 import { ApiResultInfo } from "./api-result-info.interface";
+import { DocumentData } from "firebase/firestore";
 
 export interface APIGamesResponse {
   response: {
