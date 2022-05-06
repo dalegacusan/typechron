@@ -21,6 +21,7 @@ import {
   REQ_HTTP_METHOD_NOT_SUPPORTED,
   REQ_SUCCESS,
   UNAUTHENTICATED_USER,
+  UPDATE_USER_DECLINED,
   USERNAME_EXISTS,
   USER_NOT_ALLOWED_TO_CHANGE_USERNAME,
   USER_NOT_FOUND,
@@ -39,6 +40,7 @@ import {
   USER_UPDATE_TYPE,
 } from "../../../utils/api/schema/user-update";
 import { withAuth } from "../../../utils/api/middlewares/withAuth.middleware";
+import { accountUpdateLimit } from "../../../config/app";
 
 const handler = async (
   req: NextApiRequestWithIdToken,
@@ -105,6 +107,8 @@ const handler = async (
             username: defaultUsername,
             lowercaseUsername: defaultUsername.toLowerCase(),
             dateCreated,
+            dateUpdated: dateCreated,
+            updateCount: 0,
             highestScoringGame: {
               gameId: "",
               round: 0,
@@ -171,37 +175,46 @@ const handler = async (
           if (!userQuery.user) {
             resInfo = USER_NOT_FOUND;
           } else {
-            const usernameQuery = await GetUserByUsername(
-              reqBody.request.body.username
-            );
-
-            if (!usernameQuery.user) {
-              // Check if one day has passed from account creation date
-              const oneDayFromCreation = AddOneDayFromUnixTimestamp(
-                userQuery.user.dateCreated
-              );
-              const isOneDayPassed = Date.now() > oneDayFromCreation;
-
-              if (!isOneDayPassed) {
-                resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
-              } else {
-                const dataTobeUpdated = {
-                  username: reqBody.request.body.username,
-                };
-
-                const updatedUser = await UpdateUser(
-                  reqBody.request.body.userId,
-                  dataTobeUpdated
-                );
-
-                if (updatedUser.user) {
-                  resInfo = REQ_SUCCESS;
-                } else {
-                  resInfo = FAILED_TO_UPDATE_USER;
-                }
-              }
+            // Check if can still update account details
+            if (userQuery.user.updateCount >= accountUpdateLimit) {
+              resInfo = UPDATE_USER_DECLINED;
             } else {
-              resInfo = USERNAME_EXISTS;
+              const usernameQuery = await GetUserByUsername(
+                reqBody.request.body.username
+              );
+
+              if (!usernameQuery.user) {
+                // Check if one day has passed from account creation date
+                const oneDayFromCreation = AddOneDayFromUnixTimestamp(
+                  userQuery.user.dateCreated
+                );
+                const isOneDayPassed = Date.now() > oneDayFromCreation;
+
+                if (!isOneDayPassed) {
+                  resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
+                } else {
+                  const dataTobeUpdated = {
+                    username: reqBody.request.body.username,
+                    lowercaseUsername:
+                      reqBody.request.body.username.toLowerCase(),
+                    dateUpdated: Date.now(),
+                    updateCount: userQuery.user.updateCount + 1,
+                  };
+
+                  const updatedUser = await UpdateUser(
+                    reqBody.request.body.userId,
+                    dataTobeUpdated
+                  );
+
+                  if (updatedUser.user) {
+                    resInfo = REQ_SUCCESS;
+                  } else {
+                    resInfo = FAILED_TO_UPDATE_USER;
+                  }
+                }
+              } else {
+                resInfo = USERNAME_EXISTS;
+              }
             }
           }
         }

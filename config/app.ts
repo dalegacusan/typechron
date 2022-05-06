@@ -1,6 +1,7 @@
 export const initialGameTimeInMs = 10000;
 export const initialDoneWords = ["start"];
 
+export const accountUpdateLimit = 3;
 export const usernameMinLength = 1;
 export const usernameMaxLength = 12;
 

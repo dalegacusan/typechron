@@ -4,6 +4,8 @@ export interface User {
   username?: string;
   lowercaseUsername?: string;
   dateCreated: number;
+  dateUpdated: number;
+  updateCount: number;
   highestScoringGame: {
     gameId: string;
     round: number;

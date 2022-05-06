@@ -82,6 +82,12 @@ export const FAILED_TO_UPDATE_USER: ApiResultInfo = {
   resultMsg: "Failed to update user.",
 };
 
+export const UPDATE_USER_DECLINED: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.UPDATE_USER_DECLINED,
+  resultMsg: "Update declined.",
+};
+
 export const FAILED_TO_CREATE_NEW_GAME: ApiResultInfo = {
   resultStatus: ApiResultStatus.FAILURE,
   resultCode: ApiResultCode.FAILED_TO_CREATE_NEW_GAME,

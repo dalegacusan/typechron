@@ -18,6 +18,7 @@ export interface FormattedUser {
   username?: string | null;
   photoUrl: string | null;
   dateCreated?: number;
+  updateCount?: number;
   highestScoringGame?: {
     gameId: string;
     round: number;
@@ -86,6 +87,7 @@ export default function useFirebaseAuth() {
         idToken: userIdToken,
         username: user?.username as string,
         dateCreated: user?.dateCreated as number,
+        updateCount: user?.updateCount as number,
         highestScoringGame: user?.highestScoringGame,
       }));
     } else {
@@ -116,6 +118,7 @@ export default function useFirebaseAuth() {
             idToken: userIdToken,
             username: newUser?.username as string,
             dateCreated: newUser?.dateCreated as number,
+            updateCount: newUser?.updateCount as number,
             highestScoringGame: newUser?.highestScoringGame,
           };
         });
