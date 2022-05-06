@@ -36,6 +36,10 @@ import {
   GAME_CREATE_SCHEMA,
   GAME_CREATE_TYPE,
 } from "../../../utils/api/schema/game-create";
+import {
+  GAME_QUERY_LEADERBOARDS_SCHEMA,
+  GAME_QUERY_LEADERBOARDS_TYPE,
+} from "../../../utils/api/schema/game-query-leaderboards";
 import { VerifyIdToken } from "../../../config/firebase-admin";
 import { FromBase64 } from "../../../utils/base64";
 
@@ -73,11 +77,7 @@ export default async function handler(
         if (!isValidIdToken) {
           resInfo = UNAUTHORIZED_USER;
         } else {
-          if (reqBody.request.body.userId) {
-            constraints.push(
-              where("userId", "==", reqBody.request.body.userId)
-            );
-          }
+          constraints.push(where("userId", "==", reqBody.request.body.userId));
 
           constraints.push(
             orderBy(
@@ -85,18 +85,6 @@ export default async function handler(
               reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
             )
           );
-
-          // Handle 2 similar "orderBy" to field "dateCreated"
-          // For My Account page, must use only "dateCreated" field path
-          // For Leaderboards page, must use both "score" and "dateCreated" field paths
-          if (reqBody.request.body.orderBy.fieldPath !== "dateCreated") {
-            constraints.push(
-              orderBy(
-                "dateCreated",
-                reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
-              )
-            );
-          }
 
           if (reqBody.request.body.lastKey) {
             constraints.push(startAfter(reqBody.request.body.lastKey));
@@ -111,6 +99,34 @@ export default async function handler(
 
           resInfo = REQ_SUCCESS;
         }
+      }
+    } else if (reqFunction === ApiRequestFunction.GAME_QUERY_LEADERBOARDS) {
+      const reqBody: GAME_QUERY_LEADERBOARDS_TYPE = req.body;
+      const gameQueryLeaderboardsSchema = GAME_QUERY_LEADERBOARDS_SCHEMA;
+      const schemaResult = gameQueryLeaderboardsSchema.safeParse(reqBody);
+
+      if (!schemaResult.success) {
+        const tempResInfo = INVALID_REQ_BODY_PARAMS;
+        const paramPath = schemaResult.error.issues[0].path.join(".");
+
+        tempResInfo.resultMsg = `Invalid ${paramPath}.`;
+
+        resInfo = tempResInfo;
+      } else {
+        constraints.push(
+          orderBy(
+            reqBody.request.body.orderBy.fieldPath,
+            reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
+          )
+        );
+
+        constraints.push(limit(reqBody.request.body.limit));
+
+        const query = await GetGames(constraints);
+
+        games = query.games;
+
+        resInfo = REQ_SUCCESS;
       }
     } else if (reqFunction === ApiRequestFunction.GAME_CREATE) {
       const reqBody: GAME_CREATE_TYPE = req.body;

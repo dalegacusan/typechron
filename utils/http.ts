@@ -100,7 +100,7 @@ export const QUERY_GAMES = async (
     direction: QueryOrderDirection;
     fieldPath: string;
   },
-  userId?: string,
+  userId: string,
   lastKey?: number
 ) => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
@@ -129,6 +129,38 @@ export const QUERY_GAMES = async (
     resultInfo: data.response.body.resultInfo,
     games: data.response.body.games,
     lastKey: data.response.body.lastKey,
+  };
+};
+
+export const QUERY_GAMES_LEADERBOARD = async (
+  limit: number,
+  orderBy: {
+    direction: QueryOrderDirection;
+    fieldPath: string;
+  }
+) => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      request: {
+        head: {
+          function: ApiRequestFunction.GAME_QUERY_LEADERBOARDS,
+        },
+        body: {
+          limit,
+          orderBy,
+        },
+      },
+    }),
+  });
+  const data: APIGamesResponse = await res.json();
+
+  return {
+    resultInfo: data.response.body.resultInfo,
+    games: data.response.body.games,
   };
 };
 
