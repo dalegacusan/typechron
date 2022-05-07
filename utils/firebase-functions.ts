@@ -127,7 +127,21 @@ export const GetGames = async (constraints: Array<any>) => {
     // Filter user data
     const { userId, ...gameData } = game.data();
     //@ts-ignore
-    const { email, dateCreated, highestScoringGame, ...userData } = user;
+    const {
+      //@ts-ignore
+      email,
+      //@ts-ignore
+      dateCreated,
+      //@ts-ignore
+      dateUpdated,
+      //@ts-ignore
+      lowercaseUsername,
+      //@ts-ignore
+      updateCount,
+      //@ts-ignore
+      highestScoringGame,
+      ...userData
+    } = user;
 
     games.push({
       ...gameData,

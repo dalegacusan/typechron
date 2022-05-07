@@ -132,13 +132,7 @@ export const QUERY_GAMES = async (
   };
 };
 
-export const QUERY_GAMES_LEADERBOARD = async (
-  limit: number,
-  orderBy: {
-    direction: QueryOrderDirection;
-    fieldPath: string;
-  }
-) => {
+export const QUERY_GAMES_LEADERBOARD = async () => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
     method: "POST",
     headers: {
@@ -148,10 +142,6 @@ export const QUERY_GAMES_LEADERBOARD = async (
       request: {
         head: {
           function: ApiRequestFunction.GAME_QUERY_LEADERBOARD,
-        },
-        body: {
-          limit,
-          orderBy,
         },
       },
     }),

@@ -113,17 +113,20 @@ const handler = async (
 
         resInfo = tempResInfo;
       } else {
-        constraints.push(
-          orderBy(
-            reqBody.request.body.orderBy.fieldPath,
-            reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
-          )
-        );
-        constraints.push(limit(reqBody.request.body.limit));
+        const leaderboardGamesQuery = await GetLeaderboardGames();
 
-        const query = await GetGames(constraints);
+        games = leaderboardGamesQuery.games.map((lbGame: Game) => {
+          const { id, gameId, userId, username, ...tempGame } = lbGame;
 
-        games = query.games;
+          return {
+            id: gameId,
+            user: {
+              id: lbGame.userId,
+              username,
+            },
+            ...tempGame,
+          };
+        });
 
         resInfo = REQ_SUCCESS;
       }
@@ -192,6 +195,7 @@ const handler = async (
                 const { id, ...tempGame } = gameQuery.game;
                 const tempNewGame = {
                   gameId: id,
+                  username: userQuery.user.username,
                   ...tempGame,
                 };
 

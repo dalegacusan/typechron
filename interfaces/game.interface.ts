@@ -2,8 +2,10 @@ import { User } from "./user.interface";
 
 export interface Game {
   id?: string;
+  gameId?: string; // For leaderboard
   userId: string;
   user?: User; // For leaderboard
+  username?: string; // For leaderboard
   round: number;
   score: number;
   wpm: number;

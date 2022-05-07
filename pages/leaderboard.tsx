@@ -2,12 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Box, Loader, Stack, Text, Title } from "@mantine/core";
 import { Game } from "../interfaces/game.interface";
 import { QUERY_GAMES_LEADERBOARD } from "../utils/http";
-import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.enum";
 import { useModals } from "@mantine/modals";
 import { AlertCircle } from "tabler-icons-react";
 import { showNotification } from "@mantine/notifications";
 import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
-import { defaultGamesToDisplayCount } from "../config/app";
 import GameRecordModalContent from "../components/modal-content/game-record-modal-content";
 import GameRecord from "../components/game-record";
 
@@ -25,10 +23,7 @@ const Leaderboard = () => {
   };
 
   useEffect(() => {
-    QUERY_GAMES_LEADERBOARD(defaultGamesToDisplayCount, {
-      direction: QueryOrderDirection.DESC,
-      fieldPath: "score",
-    })
+    QUERY_GAMES_LEADERBOARD()
       .then((data) => {
         if (data.resultInfo.resultStatus === ApiResultStatus.FAILURE) {
           showNotification({
