@@ -9,6 +9,7 @@ import {
   CreateUser,
   GetUser,
   GetUserByUsername,
+  UpdateLeaderboardUsernames,
   UpdateUser,
 } from "../../../utils/firebase-functions";
 import { AddOneDayFromUnixTimestamp } from "../../../utils/time";
@@ -193,7 +194,7 @@ const handler = async (
                 if (!isOneDayPassed) {
                   resInfo = USER_NOT_ALLOWED_TO_CHANGE_USERNAME;
                 } else {
-                  const dataTobeUpdated = {
+                  const dataToBeUpdated = {
                     username: reqBody.request.body.username,
                     lowercaseUsername:
                       reqBody.request.body.username.toLowerCase(),
@@ -203,11 +204,17 @@ const handler = async (
 
                   const updatedUser = await UpdateUser(
                     reqBody.request.body.userId,
-                    dataTobeUpdated
+                    dataToBeUpdated
                   );
 
                   if (updatedUser.user) {
                     resInfo = REQ_SUCCESS;
+
+                    // Update username in Leaderboard collection (if user has a leaderboard record)
+                    await UpdateLeaderboardUsernames(
+                      userQuery.user.id,
+                      dataToBeUpdated.username
+                    );
                   } else {
                     resInfo = FAILED_TO_UPDATE_USER;
                   }

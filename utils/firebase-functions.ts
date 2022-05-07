@@ -13,6 +13,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 import { firebaseDb } from "../config/firebase-app";
 import { Game } from "../interfaces/game.interface";
@@ -213,10 +214,35 @@ export const GetLeaderboardGames = async () => {
 };
 
 export const DeleteLeaderboardGame = async (gameId: string) => {
-  await deleteDoc(doc(firebaseDb, DatabaseCollection.LEADERBOARD, gameId));
+  try {
+    await deleteDoc(doc(firebaseDb, DatabaseCollection.LEADERBOARD, gameId));
+  } catch (err) {}
 };
 
+// @ref https://stackoverflow.com/a/58825593/12278028
+// @ref https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes
 export const UpdateLeaderboardUsernames = async (
   userId: string,
   username: string
-) => {};
+) => {
+  const leaderboardGamesRef = collection(
+    firebaseDb,
+    DatabaseCollection.LEADERBOARD
+  );
+  const q = query(leaderboardGamesRef, where("userId", "==", userId));
+  const leaderboardGamesSnap = await getDocs(q);
+
+  const lbGamesBatch = writeBatch(firebaseDb);
+
+  leaderboardGamesSnap.docs.forEach((tempDoc) => {
+    const lbGameRef = doc(
+      firebaseDb,
+      DatabaseCollection.LEADERBOARD,
+      tempDoc.id
+    );
+
+    lbGamesBatch.update(lbGameRef, { username });
+  });
+
+  await lbGamesBatch.commit();
+};
