@@ -5,7 +5,7 @@ export interface Game {
   gameId?: string; // For leaderboard
   userId: string;
   user?: User; // For leaderboard
-  username?: string; // For leaderboard
+  username?: string;
   round: number;
   score: number;
   wpm: number;

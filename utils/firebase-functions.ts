@@ -123,31 +123,15 @@ export const GetGames = async (constraints: Array<any>) => {
   for (const game of gamesSnap.docs) {
     lastKey = game.data().dateCreated;
 
-    const { user } = await GetUser(game.data().userId);
-
     // Filter user data
     const { userId, ...gameData } = game.data();
-    //@ts-ignore
-    const {
-      //@ts-ignore
-      email,
-      //@ts-ignore
-      dateCreated,
-      //@ts-ignore
-      dateUpdated,
-      //@ts-ignore
-      lowercaseUsername,
-      //@ts-ignore
-      updateCount,
-      //@ts-ignore
-      highestScoringGame,
-      ...userData
-    } = user;
 
     games.push({
       ...gameData,
       id: game.id,
-      user: userData,
+      user: {
+        id: userId,
+      },
     });
   }
 
