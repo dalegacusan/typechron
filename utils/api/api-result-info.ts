@@ -94,6 +94,12 @@ export const FAILED_TO_CREATE_NEW_GAME: ApiResultInfo = {
   resultMsg: "Failed to create new game.",
 };
 
+export const FAILED_TO_ADD_GAME_TO_LEADERBOARD: ApiResultInfo = {
+  resultStatus: ApiResultStatus.FAILURE,
+  resultCode: ApiResultCode.FAILED_TO_ADD_GAME_TO_LEADERBOARD,
+  resultMsg: "Failed to add game to leaderboard.",
+};
+
 export const INVALID_REQ_BODY_PARAMS: ApiResultInfo = {
   resultStatus: ApiResultStatus.FAILURE,
   resultCode: ApiResultCode.INVALID_REQ_PARAMS,

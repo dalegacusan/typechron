@@ -7,6 +7,7 @@ import { useModals } from "@mantine/modals";
 import { AlertCircle } from "tabler-icons-react";
 import { showNotification } from "@mantine/notifications";
 import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
+import { defaultGamesToDisplayCount } from "../config/app";
 import GameRecordModalContent from "../components/modal-content/game-record-modal-content";
 import GameRecord from "../components/game-record";
 
@@ -24,7 +25,7 @@ const Leaderboard = () => {
   };
 
   useEffect(() => {
-    QUERY_GAMES_LEADERBOARD(10, {
+    QUERY_GAMES_LEADERBOARD(defaultGamesToDisplayCount, {
       direction: QueryOrderDirection.DESC,
       fieldPath: "score",
     })

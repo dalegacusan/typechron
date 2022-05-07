@@ -7,6 +7,7 @@ import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.en
 import { AlertCircle, History, Settings } from "tabler-icons-react";
 import { showNotification } from "@mantine/notifications";
 import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
+import { defaultGamesToDisplayCount } from "../config/app";
 import PageNotFound from "./404";
 import AccountGameHistory from "../components/account-page/account-game-history";
 import AccountSettings from "../components/account-page/account-settings";
@@ -21,7 +22,7 @@ const UserAccount = () => {
     if (!loading && authUser) {
       QUERY_GAMES(
         authUser.idToken as string,
-        10,
+        defaultGamesToDisplayCount,
         { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },
         authUser.uid
       )

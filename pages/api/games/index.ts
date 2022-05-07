@@ -13,13 +13,16 @@ import { APIGamesResponse } from "../../../utils/api/interfaces/games.interface"
 import { Game } from "../../../interfaces/game.interface";
 import {
   CreateGame,
+  DeleteLeaderboardGame,
   GetGames,
+  GetLeaderboardGames,
   GetUser,
   UpdateUser,
 } from "../../../utils/firebase-functions";
 import { ApiResultStatus } from "../../../utils/api/enums/api-result-status.enum";
 import { ApiResultInfo } from "../../../utils/api/interfaces/api-result-info.interface";
 import {
+  FAILED_TO_ADD_GAME_TO_LEADERBOARD,
   FAILED_TO_CREATE_NEW_GAME,
   FAILED_TO_UPDATE_USER,
   INVALID_REQ_BODY_PARAMS,
@@ -42,6 +45,8 @@ import {
   GAME_QUERY_LEADERBOARD_TYPE,
 } from "../../../utils/api/schema/game-query-leaderboard";
 import { withAuth } from "../../../utils/api/middlewares/withAuth.middleware";
+import { defaultGamesToDisplayCount } from "../../../config/app";
+import { DatabaseCollection } from "../../../utils/api/enums/database-collection.enum";
 
 const handler = async (
   req: NextApiRequestWithIdToken,
@@ -74,7 +79,6 @@ const handler = async (
           resInfo = UNAUTHENTICATED_USER;
         } else {
           constraints.push(where("userId", "==", reqBody.request.body.userId));
-
           constraints.push(
             orderBy(
               reqBody.request.body.orderBy.fieldPath,
@@ -115,7 +119,6 @@ const handler = async (
             reqBody.request.body.orderBy.direction.toLowerCase() as OrderByDirection
           )
         );
-
         constraints.push(limit(reqBody.request.body.limit));
 
         const query = await GetGames(constraints);
@@ -152,14 +155,17 @@ const handler = async (
               dateCreated: Date.now(),
             };
 
-            const gameQuery = await CreateGame(newGame);
+            const gameQuery = await CreateGame(
+              newGame,
+              DatabaseCollection.GAMES
+            );
 
             if (gameQuery.game) {
               game = gameQuery.game;
 
               resInfo = REQ_SUCCESS;
 
-              // Check if new high score
+              // Check if new game is user's new high score
               if (newGame.score > userQuery.user.highestScoringGame.score) {
                 const { userId, ...filteredNewGameData } = newGame;
 
@@ -177,6 +183,57 @@ const handler = async (
 
                 if (!updatedUser.user) {
                   resInfo = FAILED_TO_UPDATE_USER;
+                }
+              }
+
+              // Don't do anything if failed to update user
+              if (resInfo.resultCode !== FAILED_TO_UPDATE_USER.resultCode) {
+                // CHECK IF RECORD IS ELIGIBLE FOR LEADERBOARDS
+                const { id, ...tempGame } = gameQuery.game;
+                const tempNewGame = {
+                  gameId: id,
+                  ...tempGame,
+                };
+
+                const leaderboardGamesQuery = await GetLeaderboardGames();
+
+                // Fill up leaderboard first if it's less than defaultGamesToDisplayCount
+                if (
+                  leaderboardGamesQuery.games.length <
+                  defaultGamesToDisplayCount
+                ) {
+                  const leaderboardGameQuery = await CreateGame(
+                    tempNewGame,
+                    DatabaseCollection.LEADERBOARD
+                  );
+
+                  // TODO - Must rollback gameQuery and/or updatedUser
+                  if (!leaderboardGameQuery.game) {
+                    resInfo = FAILED_TO_ADD_GAME_TO_LEADERBOARD;
+                  }
+                } else {
+                  // Compare new game score to score of last ranked game in leaderboard
+                  const lastRankedGameId =
+                    leaderboardGamesQuery.games[defaultGamesToDisplayCount - 1]
+                      .id;
+                  const lastRankedGameScore =
+                    leaderboardGamesQuery.games[defaultGamesToDisplayCount - 1]
+                      .score;
+
+                  // Do nothing if new game score is not greater than last ranked game score
+                  if (newGame.score > lastRankedGameScore) {
+                    await DeleteLeaderboardGame(lastRankedGameId);
+
+                    const leaderboardGameQuery = await CreateGame(
+                      tempNewGame,
+                      DatabaseCollection.LEADERBOARD
+                    );
+
+                    // TODO - Must rollback gameQuery and/or updatedUser
+                    if (!leaderboardGameQuery.game) {
+                      resInfo = FAILED_TO_ADD_GAME_TO_LEADERBOARD;
+                    }
+                  }
                 }
               }
             } else {

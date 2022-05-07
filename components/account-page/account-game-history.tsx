@@ -14,6 +14,7 @@ import { QueryOrderDirection } from "../../utils/api/enums/query-order-direction
 import { Game } from "../../interfaces/game.interface";
 import { QUERY_GAMES } from "../../utils/http";
 import { useModals } from "@mantine/modals";
+import { defaultGamesToDisplayCount } from "../../config/app";
 import GameRecord from "../game-record";
 import GameRecordModalContent from "../modal-content/game-record-modal-content";
 
@@ -54,7 +55,7 @@ const AccountGameHistory = (props: AccountGameProps) => {
       const getUserGames = async () =>
         QUERY_GAMES(
           authUser.idToken as string,
-          10,
+          defaultGamesToDisplayCount,
           { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },
           authUser.uid,
           gameLastKey

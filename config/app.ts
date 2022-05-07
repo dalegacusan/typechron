@@ -5,6 +5,8 @@ export const accountUpdateLimit = 3;
 export const usernameMinLength = 1;
 export const usernameMaxLength = 12;
 
+export const defaultGamesToDisplayCount = 10;
+
 export const black = "#101113";
 export const green = "#82c91e";
 export const red = "#fa5252";

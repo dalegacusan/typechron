@@ -1,10 +1,14 @@
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   DocumentData,
   getDoc,
   getDocs,
+  limit,
+  orderBy,
+  OrderByDirection,
   query,
   setDoc,
   updateDoc,
@@ -14,7 +18,9 @@ import { firebaseDb } from "../config/firebase-app";
 import { Game } from "../interfaces/game.interface";
 import { User } from "../interfaces/user.interface";
 import { DatabaseCollection } from "./api/enums/database-collection.enum";
+import { QueryOrderDirection } from "./api/enums/query-order-direction.enum";
 
+// ================
 // Users
 // ================
 
@@ -96,6 +102,7 @@ export const UpdateUser = async (userId: string, dataToBeUpdated: any) => {
   };
 };
 
+// ================
 // Games
 // ================
 
@@ -135,17 +142,21 @@ export const GetGames = async (constraints: Array<any>) => {
   };
 };
 
-export const CreateGame = async (game: Game) => {
+export const CreateGame = async (
+  game: Game | DocumentData,
+  dbCollection: DatabaseCollection
+) => {
   let newGame: DocumentData | null = null;
 
   try {
-    const gameDoc = await addDoc(
-      collection(firebaseDb, DatabaseCollection.GAMES),
-      game
-    );
+    let gameDoc, gameId;
+
+    gameDoc = await addDoc(collection(firebaseDb, dbCollection), game);
+
+    gameId = gameDoc.id;
 
     newGame = {
-      id: gameDoc.id,
+      id: gameId,
       ...game,
     };
   } catch (err) {
@@ -156,3 +167,42 @@ export const CreateGame = async (game: Game) => {
     game: newGame,
   };
 };
+
+// ================
+// Leaderboard
+// ================
+
+export const GetLeaderboardGames = async () => {
+  const leaderboardGamesRef = collection(
+    firebaseDb,
+    DatabaseCollection.LEADERBOARD
+  );
+  const q = query(
+    leaderboardGamesRef,
+    orderBy(
+      "score",
+      QueryOrderDirection.DESC.toLowerCase() as OrderByDirection
+    ),
+    limit(10)
+  );
+  const leaderboardGamesSnap = await getDocs(q);
+
+  const games: any = [];
+
+  leaderboardGamesSnap.docs.forEach((game) =>
+    games.push({ ...game.data(), id: game.id })
+  );
+
+  return {
+    games,
+  };
+};
+
+export const DeleteLeaderboardGame = async (gameId: string) => {
+  await deleteDoc(doc(firebaseDb, DatabaseCollection.LEADERBOARD, gameId));
+};
+
+export const UpdateLeaderboardUsernames = async (
+  userId: string,
+  username: string
+) => {};

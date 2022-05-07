@@ -67,7 +67,8 @@ const HelpModalContent = () => {
       <Space h="sm" />
 
       <Text size="sm">
-        Yes. You can change your username 1 day after creating your account.
+        Yes. You can change your username 1 day after creating your account. You
+        can update your account up to 3 times only.
       </Text>
 
       <Space h="sm" />
