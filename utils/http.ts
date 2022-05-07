@@ -93,7 +93,7 @@ export const UPDATE_USER = async (
   };
 };
 
-export const QUERY_GAMES = async (
+export const QUERY_GAMES_USER = async (
   userIdToken: string,
   limit: number,
   orderBy: {
@@ -112,7 +112,7 @@ export const QUERY_GAMES = async (
     body: JSON.stringify({
       request: {
         head: {
-          function: ApiRequestFunction.GAME_QUERY,
+          function: ApiRequestFunction.GAME_QUERY_USER,
         },
         body: {
           limit,

@@ -12,7 +12,7 @@ import React from "react";
 import { useAuth } from "../../ contexts/authUserContext";
 import { QueryOrderDirection } from "../../utils/api/enums/query-order-direction.enum";
 import { Game } from "../../interfaces/game.interface";
-import { QUERY_GAMES } from "../../utils/http";
+import { QUERY_GAMES_USER } from "../../utils/http";
 import { useModals } from "@mantine/modals";
 import { defaultGamesToDisplayCount } from "../../config/app";
 import GameRecord from "../game-record";
@@ -53,7 +53,7 @@ const AccountGameHistory = (props: AccountGameProps) => {
       setIsLoadingNextGames(true);
 
       const getUserGames = async () =>
-        QUERY_GAMES(
+        QUERY_GAMES_USER(
           authUser.idToken as string,
           defaultGamesToDisplayCount,
           { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },

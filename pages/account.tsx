@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Group, Loader, Tabs, Text, Title } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { Game } from "../interfaces/game.interface";
-import { QUERY_GAMES } from "../utils/http";
+import { QUERY_GAMES_USER } from "../utils/http";
 import { QueryOrderDirection } from "../utils/api/enums/query-order-direction.enum";
 import { AlertCircle, History, Settings } from "tabler-icons-react";
 import { showNotification } from "@mantine/notifications";
@@ -20,7 +20,7 @@ const UserAccount = () => {
 
   useEffect(() => {
     if (!loading && authUser) {
-      QUERY_GAMES(
+      QUERY_GAMES_USER(
         authUser.idToken as string,
         defaultGamesToDisplayCount,
         { direction: QueryOrderDirection.DESC, fieldPath: "dateCreated" },

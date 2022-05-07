@@ -33,8 +33,8 @@ import {
   USER_NOT_FOUND,
 } from "../../../utils/api/api-result-info";
 import {
-  GAME_QUERY_SCHEMA,
-  GAME_QUERY_TYPE,
+  GAME_QUERY_USER_SCHEMA,
+  GAME_QUERY_USER_TYPE,
 } from "../../../utils/api/schema/game-query";
 import {
   GAME_CREATE_SCHEMA,
@@ -62,9 +62,9 @@ const handler = async (
       games: DocumentData[] | undefined,
       lastKey: number | undefined;
 
-    if (reqFunction === ApiRequestFunction.GAME_QUERY) {
-      const reqBody: GAME_QUERY_TYPE = req.body;
-      const gameQuerySchema = GAME_QUERY_SCHEMA;
+    if (reqFunction === ApiRequestFunction.GAME_QUERY_USER) {
+      const reqBody: GAME_QUERY_USER_TYPE = req.body;
+      const gameQuerySchema = GAME_QUERY_USER_SCHEMA;
       const schemaResult = gameQuerySchema.safeParse(reqBody);
 
       if (!schemaResult.success) {
