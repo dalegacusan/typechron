@@ -53,7 +53,9 @@ export default function useFirebaseAuth() {
     // Need to handle "FirebaseError: Firebase: Error (auth/popup-closed-by-user)."
     // This error happens when closing the sign in pop-up
     try {
-      return signInWithPopup(firebaseAuth, provider);
+      const res = await signInWithPopup(firebaseAuth, provider);
+
+      return res;
     } catch (err) {
       return { code: null, message: null };
     }
