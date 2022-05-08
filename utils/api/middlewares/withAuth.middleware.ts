@@ -55,7 +55,7 @@ export function withAuth(handler: any) {
           const decodedToken = await VerifyIdToken(FromBase64(token));
 
           if (!decodedToken || !decodedToken.uid) {
-            return res.status(401).json({ ...resBody, ...decodedToken });
+            return res.status(401).json(resBody);
           }
 
           req.uid = decodedToken.uid;
