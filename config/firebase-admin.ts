@@ -1,9 +1,14 @@
 const admin = require("firebase-admin");
-const serviceAccount = require(`../typechron-service-account-key.prod.json`);
+import { FromBase64 } from "../utils/base64";
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    // @ref https://stackoverflow.com/a/48834975/12278028
+    credential: admin.credential.cert(
+      JSON.parse(
+        FromBase64(process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT_KEY as string)
+      )
+    ),
   });
 }
 
