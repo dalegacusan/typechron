@@ -5,7 +5,7 @@ import { APIUsersResponse } from "./api/interfaces/users.interface";
 import { ToBase64 } from "./base64";
 
 export const QUERY_USER = async (userIdToken: string, userId: string) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/users`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${ToBase64(userIdToken)}`,
@@ -36,7 +36,7 @@ export const CREATE_USER = async (
   email: string,
   username?: string
 ) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/users`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${ToBase64(userIdToken)}`,
@@ -68,7 +68,7 @@ export const UPDATE_USER = async (
   userId: string,
   username: string
 ) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/users`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/users`, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${ToBase64(userIdToken)}`,
@@ -103,7 +103,7 @@ export const QUERY_GAMES_USER = async (
   userId: string,
   lastKey?: number
 ) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/games`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${ToBase64(userIdToken)}`,
@@ -133,7 +133,7 @@ export const QUERY_GAMES_USER = async (
 };
 
 export const QUERY_GAMES_LEADERBOARD = async () => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/games`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -162,7 +162,7 @@ export const CREATE_GAME = async (
   wpm: number,
   words: string[]
 ) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/games`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/games`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${ToBase64(userIdToken)}`,
