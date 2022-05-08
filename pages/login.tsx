@@ -4,6 +4,7 @@ import { Box, Center, Loader, Paper, Text, Title } from "@mantine/core";
 import { red } from "../config/app";
 import GoogleLoginButton from "../components/social-login-buttons/google-login-btn";
 import Link from "next/link";
+import Head from "next/head";
 
 const SignIn = () => {
   const { loading, signInWithGoogle, authUser } = useAuth();
@@ -30,69 +31,74 @@ const SignIn = () => {
   };
 
   return (
-    <Box>
-      <Title
-        align="center"
-        sx={(theme) => ({
-          fontWeight: 900,
-        })}
-      >
-        Welcome back!
-      </Title>
-
-      <Text color="dimmed" size="sm" align="center" mt={5}>
-        Sign in to join the leaderboard.
-      </Text>
-
-      <Center>
-        <Paper
-          withBorder
-          shadow="md"
-          p={30}
-          radius="md"
-          mt="xl"
-          style={{ width: "50%" }}
+    <>
+      <Head>
+        <title>Typechron - Sign In</title>
+      </Head>
+      <Box>
+        <Title
+          align="center"
+          sx={(theme) => ({
+            fontWeight: 900,
+          })}
         >
-          {loading && (
-            <Center>
-              <Loader size="sm" />
-            </Center>
-          )}
+          Welcome back!
+        </Title>
 
-          {!loading && !authUser && (
-            <>
-              <GoogleLoginButton
-                radius="xs"
-                variant="white"
-                onClick={signIn}
-                fullWidth
-              >
-                Sign in with Google
-              </GoogleLoginButton>
-              <Box mt="lg">
-                <Link href="/" passHref>
-                  <Text component="a" variant="link" size="sm" color="gray">
-                    or play as a guest
-                  </Text>
-                </Link>
-              </Box>
-            </>
-          )}
+        <Text color="dimmed" size="sm" align="center" mt={5}>
+          Sign in to join the leaderboard.
+        </Text>
 
-          {!signInError.isError && !loading && authUser && (
-            <Text color="dimmed" size="sm" align="center" mt={5}>
-              You are already signed in.
-            </Text>
-          )}
+        <Center>
+          <Paper
+            withBorder
+            shadow="md"
+            p={30}
+            radius="md"
+            mt="xl"
+            style={{ width: "50%" }}
+          >
+            {loading && (
+              <Center>
+                <Loader size="sm" />
+              </Center>
+            )}
 
-          {signInError.isError && (
-            <Text color={red} align="center" mt={12}>
-              Failed to sign in. Ref: {signInError.code}
-            </Text>
-          )}
-        </Paper>
-      </Center>
-    </Box>
+            {!loading && !authUser && (
+              <>
+                <GoogleLoginButton
+                  radius="xs"
+                  variant="white"
+                  onClick={signIn}
+                  fullWidth
+                >
+                  Sign in with Google
+                </GoogleLoginButton>
+                <Box mt="lg">
+                  <Link href="/" passHref>
+                    <Text component="a" variant="link" size="sm" color="gray">
+                      or play as a guest
+                    </Text>
+                  </Link>
+                </Box>
+              </>
+            )}
+
+            {!signInError.isError && !loading && authUser && (
+              <Text color="dimmed" size="sm" align="center" mt={5}>
+                You are already signed in.
+              </Text>
+            )}
+
+            {signInError.isError && (
+              <Text color={red} align="center" mt={12}>
+                Failed to sign in. Ref: {signInError.code}
+              </Text>
+            )}
+          </Paper>
+        </Center>
+      </Box>
+    </>
   );
 };
 

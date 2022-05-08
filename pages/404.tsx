@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { useRouter } from "next/router";
 import image from "../components/images/not-found.svg";
+import Head from "next/head";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -51,40 +52,45 @@ const PageNotFound = () => {
   const router = useRouter();
 
   return (
-    <SimpleGrid
-      spacing={80}
-      cols={2}
-      breakpoints={[{ maxWidth: "sm", cols: 1, spacing: 40 }]}
-    >
-      <Image
-        src={image.src}
-        className={classes.mobileImage}
-        alt="page not found"
-      />
-      <div>
-        <Title className={classes.title}>Oops! Page Not Found</Title>
-        <Text color="dimmed" size="md">
-          Page you are trying to open does not exist. You may have mistyped the
-          address, or the page has been moved to another URL. If you think this
-          is an error, please contact support.
-        </Text>
-        <Button
-          variant="outline"
-          size="sm"
-          mt="xl"
-          color="gray"
-          className={classes.control}
-          onClick={() => router.push("/")}
-        >
-          Get back to home page
-        </Button>
-      </div>
-      <Image
-        src={image.src}
-        className={classes.desktopImage}
-        alt="page not found"
-      />
-    </SimpleGrid>
+    <>
+      <Head>
+        <title>Typechron - Page not found</title>
+      </Head>
+      <SimpleGrid
+        spacing={80}
+        cols={2}
+        breakpoints={[{ maxWidth: "sm", cols: 1, spacing: 40 }]}
+      >
+        <Image
+          src={image.src}
+          className={classes.mobileImage}
+          alt="page not found"
+        />
+        <div>
+          <Title className={classes.title}>Oops! Page Not Found</Title>
+          <Text color="dimmed" size="md">
+            Page you are trying to open does not exist. You may have mistyped
+            the address, or the page has been moved to another URL. If you think
+            this is an error, please contact support.
+          </Text>
+          <Button
+            variant="outline"
+            size="sm"
+            mt="xl"
+            color="gray"
+            className={classes.control}
+            onClick={() => router.push("/")}
+          >
+            Get back to home page
+          </Button>
+        </div>
+        <Image
+          src={image.src}
+          className={classes.desktopImage}
+          alt="page not found"
+        />
+      </SimpleGrid>
+    </>
   );
 };
 

@@ -11,6 +11,7 @@ import { defaultGamesToDisplayCount } from "../config/app";
 import PageNotFound from "./404";
 import AccountGameHistory from "../components/account-page/account-game-history";
 import AccountSettings from "../components/account-page/account-settings";
+import Head from "next/head";
 
 const UserAccount = () => {
   const { authUser, loading } = useAuth();
@@ -60,47 +61,52 @@ const UserAccount = () => {
   }, [loading]);
 
   return (
-    <Box mb={70}>
-      {loading && !authUser && <Loader size="sm" />}
+    <>
+      <Head>
+        <title>Typechron - My Account</title>
+      </Head>
+      <Box mb={70}>
+        {loading && !authUser && <Loader size="sm" />}
 
-      {!loading && !authUser && (
-        <>
-          <PageNotFound />
-        </>
-      )}
+        {!loading && !authUser && (
+          <>
+            <PageNotFound />
+          </>
+        )}
 
-      {!loading && authUser && (
-        <Box>
-          <Title order={2}>My Account</Title>
-          <Group grow>
-            <Text size="sm" color="dimmed" mt={4}>
-              Hello, {authUser.username}
-            </Text>
-            {games && games.length !== 0 && (
-              <Text size="sm" align="right" color="dimmed">
-                Showing {games.length} record{games.length !== 1 && "s"}
+        {!loading && authUser && (
+          <Box>
+            <Title order={2}>My Account</Title>
+            <Group grow>
+              <Text size="sm" color="dimmed" mt={4}>
+                Hello, {authUser.username}
               </Text>
-            )}
-          </Group>
+              {games && games.length !== 0 && (
+                <Text size="sm" align="right" color="dimmed">
+                  Showing {games.length} record{games.length !== 1 && "s"}
+                </Text>
+              )}
+            </Group>
 
-          <Tabs color="blue" mt={30}>
-            <Tabs.Tab label="History" icon={<History size={16} />}>
-              <AccountGameHistory
-                games={games}
-                setGames={setGames}
-                gameLastKey={gameLastKey}
-                setGameLastKey={setGameLastKey}
-                isLoadingNextGames={isLoadingNextGames}
-                setIsLoadingNextGames={setIsLoadingNextGames}
-              />
-            </Tabs.Tab>
-            <Tabs.Tab label="Settings" icon={<Settings size={16} />}>
-              <AccountSettings />
-            </Tabs.Tab>
-          </Tabs>
-        </Box>
-      )}
-    </Box>
+            <Tabs color="blue" mt={30}>
+              <Tabs.Tab label="History" icon={<History size={16} />}>
+                <AccountGameHistory
+                  games={games}
+                  setGames={setGames}
+                  gameLastKey={gameLastKey}
+                  setGameLastKey={setGameLastKey}
+                  isLoadingNextGames={isLoadingNextGames}
+                  setIsLoadingNextGames={setIsLoadingNextGames}
+                />
+              </Tabs.Tab>
+              <Tabs.Tab label="Settings" icon={<Settings size={16} />}>
+                <AccountSettings />
+              </Tabs.Tab>
+            </Tabs>
+          </Box>
+        )}
+      </Box>
+    </>
   );
 };
 

@@ -8,6 +8,7 @@ import { showNotification } from "@mantine/notifications";
 import { ApiResultStatus } from "../utils/api/enums/api-result-status.enum";
 import GameRecordModalContent from "../components/modal-content/game-record-modal-content";
 import GameRecord from "../components/game-record";
+import Head from "next/head";
 
 const Leaderboard = () => {
   const modals = useModals();
@@ -56,36 +57,41 @@ const Leaderboard = () => {
   }, []);
 
   return (
-    <Box mb={70}>
-      <Title order={2}>Leaderboard</Title>
-      <Text size="sm" color="dimmed" mt={4}>
-        Click on a record for more information
-      </Text>
+    <>
+      <Head>
+        <title>Typechron - Leaderboard</title>
+      </Head>
+      <Box mb={70}>
+        <Title order={2}>Leaderboard</Title>
+        <Text size="sm" color="dimmed" mt={4}>
+          Click on a record for more information
+        </Text>
 
-      <Box mt={30}>
-        {!games && <Loader size="sm" />}
+        <Box mt={30}>
+          {!games && <Loader size="sm" />}
 
-        {games && games.length === 0 && (
-          <Text color="dimmed">No available data</Text>
-        )}
+          {games && games.length === 0 && (
+            <Text color="dimmed">No available data</Text>
+          )}
 
-        {games && games.length !== 0 && (
-          <Stack>
-            {games.map((game: Game, idx: number) => {
-              return (
-                <GameRecord
-                  key={game.id}
-                  index={idx}
-                  game={game}
-                  handleRecordClick={() => openGameRecordModal(game)}
-                  isLeaderboard={true}
-                />
-              );
-            })}
-          </Stack>
-        )}
+          {games && games.length !== 0 && (
+            <Stack>
+              {games.map((game: Game, idx: number) => {
+                return (
+                  <GameRecord
+                    key={game.id}
+                    index={idx}
+                    game={game}
+                    handleRecordClick={() => openGameRecordModal(game)}
+                    isLeaderboard={true}
+                  />
+                );
+              })}
+            </Stack>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 
