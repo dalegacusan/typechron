@@ -1,5 +1,5 @@
 const admin = require("firebase-admin");
-const serviceAccount = require("../firebaseAdminServiceAccountKey.json");
+const serviceAccount = require(`../typechron-service-account-key.prod.json`);
 
 if (!admin.apps.length) {
   admin.initializeApp({
