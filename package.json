@@ -19,7 +19,6 @@
     "next": "12.1.5",
     "random-words": "^1.1.2",
     "react": "18.1.0",
-    "react-countdown": "^2.3.2",
     "react-dom": "18.1.0",
     "tabler-icons-react": "^1.47.0",
     "unique-names-generator": "^4.7.1",

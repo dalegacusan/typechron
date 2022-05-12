@@ -1,5 +1,4 @@
 import React from "react";
-import Countdown from "react-countdown";
 import { initialGameTimeInMs } from "../config/app";
 import { Grid, Text } from "@mantine/core";
 import GameTime from "./game-time";
@@ -7,33 +6,16 @@ import GameTime from "./game-time";
 interface GameHeaderProps {
   isInGame: boolean;
   isGameEnded: boolean;
-  gameTime: number;
   round: number;
 }
 
 const GameHeader = (props: GameHeaderProps) => {
-  const { isInGame, isGameEnded, gameTime, round } = props;
+  const { isInGame, isGameEnded, round } = props;
 
   return (
     <Grid grow>
-      <Grid.Col span={4}>
+      <Grid.Col span={12}>
         <Text size="xl">
-          {isInGame ? (
-            // Display game time in milliseconds
-            <Countdown
-              date={Date.now() + gameTime}
-              intervalDelay={20}
-              precision={3}
-              renderer={GameTime}
-            />
-          ) : (
-            // Display default time
-            `${initialGameTimeInMs / 1000.0}:00s` // @ref https://stackoverflow.com/a/14090907/12278028
-          )}
-        </Text>
-      </Grid.Col>
-      <Grid.Col span={4}>
-        <Text size="xl" align="right">
           {/* Display Round */}
           {!isGameEnded && `Round ${round}`}
           {/* Display "Game Ended" */}

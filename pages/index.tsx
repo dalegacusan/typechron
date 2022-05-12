@@ -3,7 +3,7 @@ import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTimeInMs } from "../utils/time";
 import { black, initialDoneWords, initialGameTimeInMs } from "../config/app";
-import { Box, Button, Input, Paper, Text } from "@mantine/core";
+import { Box, Button, Input, Paper, Progress, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { AlertCircle, Check, DeviceFloppy, Refresh } from "tabler-icons-react";
 import { CREATE_GAME } from "../utils/http";
@@ -14,6 +14,7 @@ import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
 import Link from "next/link";
 import DoneWords from "../components/done-words";
+import TimerBar from "../components/timer-bar";
 
 const Home: NextPage = () => {
   const { authUser, loading } = useAuth();
@@ -181,22 +182,17 @@ const Home: NextPage = () => {
   return (
     <Box>
       {/* TODO - Add a visual indicator like +1 on every correct word (Mantine Tooltip?) */}
-
       <GameHeader
         isInGame={isInGame}
         isGameEnded={isGameEnded}
-        gameTime={gameTime}
         round={doneWords.length}
       />
-
       <GameStats score={userScore} wpm={wpm} />
-
       <CurrentWord
         word={currentWord}
         userInput={userInput}
         isInGame={isInGame}
       />
-
       {/* Word Input */}
       <Paper
         px="md"
@@ -213,13 +209,21 @@ const Home: NextPage = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setUserInput(e.target.value)
           }
+          // Prevent pasting in input
           onPaste={(e: React.FormEvent<HTMLInputElement>) => {
             e.preventDefault();
             return false;
-          }} // Prevent pasting in input
+          }}
           autoComplete="false"
+          autoCapitalize="off"
+          autoCorrect="off"
+          spellCheck="false"
         />
       </Paper>
+
+      <Box mb={16}>
+        <TimerBar gameTime={gameTime} />
+      </Box>
 
       {/* Save record button */}
       <Box mb={14}>
@@ -256,7 +260,6 @@ const Home: NextPage = () => {
             </Button>
           )}
       </Box>
-
       {/* Display done words for reference on how well a user did */}
       <Box>
         <DoneWords words={doneWords} />
