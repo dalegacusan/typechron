@@ -2,11 +2,12 @@ import { Progress } from "@mantine/core";
 import React from "react";
 
 interface TimerBarProps {
+  isInGame: boolean;
   gameTime: number;
 }
 
 const TimerBar = (props: TimerBarProps) => {
-  const { gameTime } = props;
+  const { isInGame, gameTime } = props;
 
   const gameTimeIntervalBy100 = gameTime / 100;
   const gameTimeIntervalBy10 = gameTime / 1000;
@@ -23,9 +24,10 @@ const TimerBar = (props: TimerBarProps) => {
   return (
     <Progress
       value={gameTimeIntervalBy100}
-      label={`${gameTimeIntervalBy10}s`}
+      label={gameTimeIntervalBy10.toString()}
       color={color}
       size="lg"
+      animate={isInGame}
     />
   );
 };

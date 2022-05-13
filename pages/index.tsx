@@ -3,12 +3,13 @@ import { GenerateWord } from "../utils/words";
 import { useEffect, useState } from "react";
 import { CurrentTimeInMs } from "../utils/time";
 import { black, initialDoneWords, initialGameTimeInMs } from "../config/app";
-import { Box, Button, Input, Paper, Progress, Text } from "@mantine/core";
+import { Box, Button, Input, Paper, Text } from "@mantine/core";
 import { useAuth } from "../ contexts/authUserContext";
 import { AlertCircle, Check, DeviceFloppy, Refresh } from "tabler-icons-react";
 import { CREATE_GAME } from "../utils/http";
 import { showNotification } from "@mantine/notifications";
 import { ApiResultCode } from "../utils/api/enums/api-result-code.enum";
+import { useFocusTrap } from "@mantine/hooks";
 import CurrentWord from "../components/current-word";
 import GameHeader from "../components/game-header";
 import GameStats from "../components/game-stats";
@@ -18,6 +19,7 @@ import TimerBar from "../components/timer-bar";
 
 const Home: NextPage = () => {
   const { authUser, loading } = useAuth();
+  const focusTrapRef = useFocusTrap();
 
   const [userInput, setUserInput] = useState<string>("");
   const [userScore, setUserScore] = useState<number>(0);
@@ -199,6 +201,7 @@ const Home: NextPage = () => {
         py="xs"
         my="md"
         style={{ backgroundColor: black }}
+        ref={focusTrapRef}
         withBorder
       >
         <Input
@@ -214,6 +217,7 @@ const Home: NextPage = () => {
             e.preventDefault();
             return false;
           }}
+          autoFocus={true}
           autoComplete="false"
           autoCapitalize="off"
           autoCorrect="off"
@@ -222,7 +226,7 @@ const Home: NextPage = () => {
       </Paper>
 
       <Box mb={16}>
-        <TimerBar gameTime={gameTime} />
+        <TimerBar isInGame={isInGame} gameTime={gameTime} />
       </Box>
 
       {/* Save record button */}
